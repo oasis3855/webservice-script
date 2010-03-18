@@ -7,6 +7,7 @@
 #     http://oasis.halfmoon.jp/
 #
 # version 1.0 (2010/03/13)
+# version 1.1 (2010/03/19)
 #
 # GNU GPL Free Software
 # http://www.opensource.jp/gpl/gpl.ja.html
@@ -37,6 +38,7 @@ my $boolWriteBooleanAttr = 0;
 my $boolRewriteAttrSmall = 0;
 my $boolImgAlt           = 0;
 my $boolIndentTab        = 0;
+my $boolDownload         = 0;
 
 # デバッグ用
 my $boolDebug = 0;
@@ -71,7 +73,6 @@ my @arrAttr = (
     [ 'tr',       'bgcolor',  'align',    'valign' ],
     [ 'ul',       'type' ]
 );
-sub_print_html_header();
 my $q = CGI->new;
 
 # 機能スイッチの設定
@@ -80,6 +81,8 @@ if ( $q->param('chk_attrsmall') ) { $boolRewriteAttrSmall = 1; }
 if ( $q->param('chk_imgalt') )    { $boolImgAlt           = 1; }
 if ( $q->param('chk_tab') )       { $boolIndentTab        = 1; }
 if ( $q->param('chk_debug') )     { $boolDebug            = 1; }
+if ( $q->param('chk_download') )  { $boolDownload         = 1; }
+sub_print_html_header();
 
 # ファイルアップロードされたときの処理
 if ( $q->param('uploadfile') ) {
@@ -99,7 +102,7 @@ if ( $q->param('uploadfile') ) {
         binmode(fo);
         print( fo $datFile );
         close(fo);
-        print "<p>一時ファイルに保存しました</p>\n";
+        if ( !$boolDownload ) { print "<p>一時ファイルに保存しました</p>\n"; }
         sub_print_html();
     }
     else {
@@ -109,7 +112,9 @@ if ( $q->param('uploadfile') ) {
 else {
     sub_print_inputform();
 }
-print "<p>&nbsp;</p>\n<p><a href=\"" . $strThisScript . "\">初期画面に戻る</a></p>\n";
+if ( !$boolDownload ) {
+    print "<p>&nbsp;</p>\n<p><a href=\"" . $strThisScript . "\">初期画面に戻る</a></p>\n";
+}
 sub_print_html_footer();
 
 #一時ファイルの削除
@@ -117,25 +122,33 @@ unlink("upload/temp.txt");
 exit(0);
 
 sub sub_print_html_header {
-    print "Content-type: text/html\n\n";
-    print
+    if ($boolDownload) {
+        print "Content-Type: application/octet-stream\n"
+          . "Content-Disposition: attachment; filename=output.html\n" . "\n";
+    }
+    else {
+        print "Content-type: text/html\n\n";
+        print
 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-      . "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-      . "<head>\n"
-      . "\t<meta content=\"text/html; charset=UTF-8\" />\n"
-      . "\t<title>HTML::TreeBuilderによるHTML整形</title>\n"
-      . "\t<style type=\"text/css\">\n"
-      . "\tpre { border:1px solid gray; background-color: #c0c0c0; width: 795px; overflow-x: scroll; font-size: 10pt;}\n"
-      . "\tbody {position: relative; width: 800px; margin: 0 auto; font-size: 11pt;};\n"
-      . "\t</style>\n"
-      . "</head>\n"
-      . "<body>\n"
-      . "<p>HTML::TreeBuilderによるHTML整形</p>\n";
+          . "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+          . "<head>\n"
+          . "\t<meta content=\"text/html; charset=UTF-8\" />\n"
+          . "\t<title>HTML::TreeBuilderによるHTML整形</title>\n"
+          . "\t<style type=\"text/css\">\n"
+          . "\tpre { border:1px solid gray; background-color: #c0c0c0; width: 795px; overflow-x: scroll; font-size: 10pt;}\n"
+          . "\tbody {position: relative; width: 800px; margin: 0 auto; font-size: 11pt;};\n"
+          . "\t</style>\n"
+          . "</head>\n"
+          . "<body>\n"
+          . "<p>HTML::TreeBuilderによるHTML整形</p>\n";
+    }
     return;
 }
 
 sub sub_print_html_footer {
-    print "</body>\n</html>\n";
+    if ( !$boolDownload ) {
+        print "</body>\n</html>\n";
+    }
     return;
 }
 
@@ -149,13 +162,15 @@ sub sub_print_inputform {
       . "<input type=\"checkbox\" name=\"chk_attrsmall\" checked=\"checked\" />属性値は英数小文字(XHTML), \n"
       . "<input type=\"checkbox\" name=\"chk_imgalt\" checked=\"checked\" />imgにalt属性無い場合は補完(XHTML)<br />\n"
       . "<input type=\"checkbox\" name=\"chk_tab\" checked=\"checked\" />インデントをTABで出力, \n"
-      . "<input type=\"checkbox\" name=\"chk_debug\" />デバッグ表示\n"
-      . "</form>\n";
+      . "<input type=\"checkbox\" name=\"chk_debug\" />デバッグ表示, \n"
+      . "<input type=\"checkbox\" name=\"chk_download\" />結果をファイルとしてダウンロード\n"
+      . "</form>\n"
+      . "<p>読み込むファイルはあらかじめUTF-8に変換しておくと、文字化けを防げます<p>\n";
     return;
 }
 
 sub sub_print_html {
-    print "<p>整形するHTMLファイル：./upload/temp.txt</p>\n";
+    if ( !$boolDownload ) { print "<p>整形するHTMLファイル：./upload/temp.txt</p>\n"; }
     open( fi, "< upload/temp.txt" ) or sub_error_exit($!);
     my $body      = "";
     my $datBuffer = "";
@@ -246,10 +261,21 @@ sub sub_print_html {
     $tree->eof();
 
     # HTMLソースコードを画面出力
-    print "<pre>\n";
-    if   ($boolIndentTab) { print encode_entities( $tree->as_HTML( '<>&', "\t", {} ), '<>&' ); }
-    else                  { print encode_entities( $tree->as_HTML( '<>&', "  ", {} ), '<>&' ); }
-    print "</pre>\n";
+    my $strEntityChar = "<>&" . pack( "U", 0x81 ) . "-" . pack( "U", 0x38f );
+
+    #	for(my $i=0x0081; $i<0x052f; $i++){ $strEntityChar .= pack("U", $i); }
+    if ($boolDownload) {
+        if   ($boolIndentTab) { print $tree->as_HTML( $strEntityChar, "\t", {} ); }
+        else                  { print $tree->as_HTML( $strEntityChar, "  ", {} ); }
+    }
+    else {
+        print "<pre>\n";
+        if ($boolIndentTab) {
+            print encode_entities( $tree->as_HTML( $strEntityChar, "\t", {} ), '<>&' );
+        }
+        else { print encode_entities( $tree->as_HTML( $strEntityChar, "  ", {} ), '<>&' ); }
+        print "</pre>\n";
+    }
 
     # ツリーを削除
     $tree = $tree->delete;
