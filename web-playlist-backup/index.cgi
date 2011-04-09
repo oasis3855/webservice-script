@@ -99,7 +99,13 @@ if(defined($q->url_param('mode'))){
 	if($q->url_param('mode') eq 'list'){
 		sub_list_db();
 	}
-	if($q->url_param('mode') eq 'backup'){
+	elsif($q->url_param('mode') eq 'edit'){
+		sub_edit_db(\$q);
+	}
+	elsif($q->url_param('mode') eq 'add'){
+		sub_edit_addnew_db(\$q);
+	}
+	elsif($q->url_param('mode') eq 'backup'){
 		sub_backup_db();
 	}
 	elsif($q->url_param('mode') eq 'upload_pick'){
@@ -163,6 +169,7 @@ _EOT
 		"<ul>\n".
 		"<li><a href=\"".$str_this_script."\">Home</a></li>\n".
 		"<li><a href=\"".$str_this_script."?mode=list\">List Database</a></li>\n".
+		"<li><a href=\"".$str_this_script."?mode=add\">Add one entry</a></li>\n".
 		"<li><a href=\"".$str_this_script."?mode=backup\">Backup Database</a></li>\n".
 		"<li><a href=\"".$str_this_script."?mode=upload_pick\">Upload PLS</a></li>\n".
 		"<li><a href=\"".$str_this_script."?mode=download\">Download PLS,CSV</a></li>\n".
@@ -282,8 +289,8 @@ sub sub_list_db{
 			for(my $i=0; $i<=$#arr; $i++){
 				if(defined($arr[$i]) && length($arr[$i])>0){ $arr[$i] = encode_entities(sub_conv_to_flagged_utf8($arr[$i], 'utf8')); }
 			}
-			printf("<li class=\"music\"><a class=\"music\" href=\"%s\">%s</a><span style=\"color:gray;\">&nbsp;(%s)</span></li>",
-					defined($arr[2])?$arr[2]:'', defined($arr[1])?$arr[1]:'', defined($arr[2])?$arr[2]:'');
+			printf("<li class=\"music\"><a href=\"".$str_this_script."?mode=edit&amp;idx=%d\" class=\"music\">%s</a><span style=\"color:gray;\">&nbsp;(%s)</span></li>",
+					defined($arr[0])?$arr[0]:'0', defined($arr[1])?$arr[1]:'', defined($arr[2])?$arr[2]:'');
 		}
 		print("</ul>\n");
 		$sth->finish();
@@ -628,12 +635,22 @@ sub sub_download_csv{
 		# SQLサーバに接続
 		$dbh = DBI->connect($str_dsn, "", "", {PrintError => 0, AutoCommit => 1}) or die(DBI::errstr);
 
-		my $str_sql = "select title,file,length from TBL_PLS order by idx";
+		# 件数を得る（$arr_rows[0]に件数が入る）
+		my $str_sql = "select count(*) from TBL_PLS";
 		my $sth = $dbh->prepare($str_sql) or die($DBI::errstr);
+		$sth->execute() or die($DBI::errstr);
+		my @arr_rows = $sth->fetchrow_array();
+		$sth->finish();
+		$sth = undef;
+		
+		# 全行のデータを読み出す
+		$str_sql = "select title,file,length from TBL_PLS order by idx";
+		$sth = $dbh->prepare($str_sql) or die($DBI::errstr);
 		$sth->execute() or die($DBI::errstr);
 
 		if($output_mode ne 'download'){
 			open(FH, '>'.$str_filepath_backup) or die("バックアップファイル ".$str_filepath_backup." に書き込めません");
+			binmode(FH, ":utf8");
 		}
 		
 		# CSVヘッダ行出力
@@ -641,6 +658,12 @@ sub sub_download_csv{
 			if($output_mode eq 'download'){ print("title,file,length\n"); }
 			else{ print(FH "title,file,length\n"); }
 		}
+		# Playlistヘッダ出力
+		if($csv_mode eq 'pls'){
+			if($output_mode eq 'download'){ print("[playlist]\nnumberofentries=".$arr_rows[0]."\n\n"); }
+			else{ print(FH "[playlist]\nnumberofentries=".$arr_rows[0]."\n\n"); }
+		}
+		
 
 		my $csv = Text::CSV_XS->new({binary=>1});
 
@@ -663,6 +686,12 @@ sub sub_download_csv{
 			
 			if($output_mode eq 'download'){ print($str); }
 			else{ print(FH $str); }
+		}
+
+		# Playlistフッタ出力
+		if($csv_mode eq 'pls'){
+			if($output_mode eq 'download'){ print("Version=2\n"); }
+			else{ print(FH "Version=2\n"); }
 		}
 
 		if($output_mode ne 'download'){ close(FH); }
@@ -726,6 +755,163 @@ sub sub_restore{
 	print "<p class=\"ok\">データの取り込み完了</p>\n";
 
 }
+
+
+# DB項目の編集
+# sub_edit_db(\$q);
+sub sub_edit_db{
+	my $q_ref = shift;
+
+	my $idx = undef;	# TBL_PLS の idx に対応
+	my $title = undef;	# 書き換え用 post パラメータ受け取り
+	my $file = undef;	# 書き換え用 post パラメータ受け取り
+	my $length = undef;	# 書き換え用 post パラメータ受け取り
+
+	print("<h1>Edit database entry (データベースの項目編集)</h1>\n");
+	
+	if(defined($$q_ref->url_param('idx'))){ $idx = $$q_ref->url_param('idx'); }
+	if(!defined($idx) or $idx < 0){ sub_error_exit('想定外のURLパラメータ'); }
+
+	# URLパラメータとPOSTパラメータのidxは同一のはず（仕様）$q->postはpostパラメータを優先して出力
+	if(defined($$q_ref->param('idx'))){
+		if($$q_ref->param('idx') ne $idx){
+			sub_error_exit('想定外のURLパラメータ');
+		}
+	}
+	# postパラメータを得る
+	if(defined($$q_ref->param('title'))){ $title = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('title')), 'utf8'); }
+	if(defined($$q_ref->param('file'))){ $file = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('file')), 'utf8'); }
+	if(defined($$q_ref->param('length'))){ $length = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('length')), 'utf8'); }
+
+	my $dbh = undef;
+	eval{
+		# SQLサーバに接続
+		$dbh = DBI->connect($str_dsn, "", "", {PrintError => 0, AutoCommit => 1}) or die("DBI open error : ".$DBI::errstr);
+
+		# データ１件削除
+		if(defined($$q_ref->param('delete'))){
+			print("<p>1件のデータ (idx=".$idx.") を削除中...</p>\n");
+			# TBL_PLSのidx=$idxデータを変更する
+			my $str_sql = "delete from TBL_PLS where idx=?";
+			my $sth = $dbh->prepare($str_sql) or die("DBI prepare error : ".$DBI::errstr);
+			$sth->execute($idx) or die("DBI execute error : ".$DBI::errstr);
+			$sth->finish();
+			print("<p class=\"ok\">1件のデータ削除完了</p>\n");
+			$dbh->disconnect or die(DBI::errstr);
+			
+			return;
+		}
+
+
+		# TBL_PLS のデータ書き換え（UPDATE命令）
+		if(defined($title) and $title ne '' and defined($file) and $file ne '' and defined($length) and $length ne ''){
+			print("<p>DB書き換え中...</p>\n");
+			# TBL_PLSのidx=$idxデータを変更する
+			my $str_sql = "update TBL_PLS set title=?,file=?,length=? where idx=?";
+			my $sth = $dbh->prepare($str_sql) or die("DBI prepare error : ".$DBI::errstr);
+			$sth->execute($title,$file,$length,$idx) or die("DBI execute error : ".$DBI::errstr);
+			$sth->finish();
+			print("<p class=\"ok\">DB書き換え完了</p>\n");
+		}
+
+		# TBL_PLSのidx=$idxデータを読み出す
+		my $str_sql = "select idx,title,file,length from TBL_PLS where idx=?";
+		my $sth = $dbh->prepare($str_sql) or die("DBI prepare error : ".$DBI::errstr);
+		$sth->execute($idx) or die("DBI execute error : ".$DBI::errstr);
+
+		my @arr = $sth->fetchrow_array();
+		if($sth->rows != 1){
+			print("<p>idxに一致するデータが存在しません</p>\n");
+		}
+		else{
+			print("<form method=\"post\" action=\"".$str_this_script."?mode=edit&amp;idx=".$arr[0]."\" name=\"form1\"></p>\n".
+					"<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n".
+					" <tr><td>idx</td><td><input name=\"idx\" type=\"text\" size=\"10\" value=\"".$arr[0]."\" readonly=\"readonly\" />（変更不可）</td></tr>\n".
+					" <tr><td>title</td><td><input name=\"title\" type=\"text\" size=\"50\" value=\"".encode_entities(sub_conv_to_flagged_utf8($arr[1], 'utf8'))."\" /></td></tr>\n".
+					" <tr><td>file</td><td><input name=\"file\" type=\"text\" size=\"50\" value=\"".encode_entities(sub_conv_to_flagged_utf8($arr[2], 'utf8'))."\" /></td></tr>\n".
+					" <tr><td>length</td><td><input name=\"length\" type=\"text\" size=\"10\" value=\"".encode_entities(sub_conv_to_flagged_utf8($arr[3],'utf8'))."\" /></td></tr>\n".
+					"</table>\n".
+					"<p><input type=\"submit\" value=\"データ更新\" />&nbsp;<input type=\"submit\" name=\"delete\" value=\"このデータを削除\" /></p>\n".
+					"</form>\n");
+
+		}
+		
+		$sth->finish();
+		$dbh->disconnect or die(DBI::errstr);
+	};
+	if($@){
+		# evalによるDBエラートラップ：エラー時の処理
+		if(defined($dbh)){ $dbh->disconnect(); }
+		my $str = $@;
+		chomp($str);
+		sub_error_exit($str);
+	}
+}
+
+
+# DBに新規項目追加
+# sub_edit_db(\$q);
+sub sub_edit_addnew_db{
+	my $q_ref = shift;
+
+	my $title = undef;	# 書き換え用 post パラメータ受け取り
+	my $file = undef;	# 書き換え用 post パラメータ受け取り
+	my $length = undef;	# 書き換え用 post パラメータ受け取り
+
+	print("<h1>Add database entry (データベースに1件追加)</h1>\n");
+	
+	# postパラメータを得る
+	if(defined($$q_ref->param('title'))){ $title = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('title')), 'utf8'); }
+	if(defined($$q_ref->param('file'))){ $file = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('file')), 'utf8'); }
+	if(defined($$q_ref->param('length'))){ $length = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('length')), 'utf8'); }
+
+	if((defined($title) and $title ne '') and (!defined($file) or $file eq '')){
+		print("<p class=\"info\">fileが空欄のため、データ追加できません</p>\n");
+		return;
+	}
+	elsif((!defined($title) or $title eq '') and (defined($file) and $file ne '')){
+		print("<p class=\"info\">titleが空欄のため、fileの値をコピーしました</p>\n");
+		$title = $file;
+	}
+	if(defined($title) and !defined($length)){ $length = -1; }
+
+	if(defined($title) and $title ne ''){
+		my $dbh = undef;
+		eval{
+			# SQLサーバに接続
+			$dbh = DBI->connect($str_dsn, "", "", {PrintError => 0, AutoCommit => 1}) or die("DBI open error : ".$DBI::errstr);
+
+			# TBL_PLS へのデータ追加（INSERT命令）
+			print("<p>DBへ新規追加中...</p>\n");
+			my $str_sql = "insert into TBL_PLS (title,file,length) values (?,?,?)";
+			my $sth = $dbh->prepare($str_sql) or die("DBI prepare error : ".$DBI::errstr);
+			$sth->execute($title,$file,$length) or die("DBI execute error : ".$DBI::errstr);
+			$sth->finish();
+			print("<p class=\"ok\">DBへ新規追加完了</p>\n");
+			
+			$dbh->disconnect or die(DBI::errstr);
+		};
+		if($@){
+			# evalによるDBエラートラップ：エラー時の処理
+			if(defined($dbh)){ $dbh->disconnect(); }
+			my $str = $@;
+			chomp($str);
+			sub_error_exit($str);
+		}
+	}
+	else{
+		print("<form method=\"post\" action=\"".$str_this_script."?mode=add\" name=\"form1\"></p>\n".
+				"<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n".
+				" <tr><td>title</td><td><input name=\"title\" type=\"text\" size=\"50\" /></td></tr>\n".
+				" <tr><td>file</td><td><input name=\"file\" type=\"text\" size=\"50\" /></td></tr>\n".
+				" <tr><td>length</td><td><input name=\"length\" type=\"text\" size=\"10\" value=\"-1\" /></td></tr>\n".
+				"</table>\n".
+				"<p><input type=\"submit\" value=\"データ追加\" /></p>\n".
+				"</form>\n");
+
+	}
+}
+
 
 # 任意の文字コードの文字列を、UTF-8フラグ付きのUTF-8に変換する
 sub sub_conv_to_flagged_utf8{
