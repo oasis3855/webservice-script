@@ -44,6 +44,7 @@ use File::Copy;
 use Image::Size;
 use Encode::Guess qw/euc-jp shiftjis iso-2022-jp/;	# 必要ないエンコードは削除すること
 use HTML::Entities;
+use Stat::lsMode qw/format_mode/;	# ファイル属性を -rwxr-xr-x のように整形する
 
 # 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
 require ((getpwuid($<))[7]).'/auth/script/auth_md5_utf8.pl';    # 認証システム
@@ -91,7 +92,10 @@ sub_print_start_html(\$q);
 
 # 処理内容に合わせた処理と、画面表示
 if(defined($q->url_param('mode'))){
-	if($q->url_param('mode') eq 'fileinfo'){
+	if($q->url_param('mode') eq 'upload' && defined($q->param('uploadfile')) && length($q->param('uploadfile'))>0){
+		sub_upload(\$q);
+	}
+	elsif($q->url_param('mode') eq 'fileinfo'){
 		sub_fileinfo(\$q);
 	}
 	elsif($q->url_param('mode') eq 'viewlog'){
@@ -103,9 +107,9 @@ if(defined($q->url_param('mode'))){
 	elsif($q->url_param('mode') eq 'listdir'){
 		sub_list(\$q, $q->param('dir'));
 	}
-}
-elsif(defined($q->param('uploadfile')) && length($q->param('uploadfile'))>0){
-	sub_upload(\$q);		# アップロード
+	else{
+		print("<p class=\"error\">プログラムが意図しない方法で起動されました</p>\n");
+	}
 }
 else{
 	sub_disp_home();
@@ -190,6 +194,7 @@ sub sub_error_exit{
 	exit;
 }
 
+
 # 各種ファイル、DBが読み書きできるか初期チェック（新規作成含む）
 sub sub_check_files{
 	my $q_ref = shift;
@@ -210,6 +215,8 @@ sub sub_check_files{
 	}
 }
 
+
+# ログファイルに書き込む
 sub sub_write_log {
 	my $str = shift;
 
@@ -239,6 +246,7 @@ sub sub_write_log {
 }
 
 
+# ログファイルを画面表示
 sub sub_view_log {
 	my $q_ref = shift;
 
@@ -250,7 +258,8 @@ sub sub_view_log {
 
 }
 
-# ホーム画面（DB内のデータ数を表示）
+
+# ホーム画面（アップロード対象ファイルの指定画面）
 sub sub_disp_home{
 	our @arr_updirs;
 	our $flag_overwrite;
@@ -258,7 +267,7 @@ sub sub_disp_home{
 
 	print("<h1>Home Screen / Upload File (ファイルのアップロード)</h1>\n".
 		"<p>画像やデータファイルをアップロード出来ます</p>\n".
-		"<form method=\"post\" action=\"$str_this_script\" enctype=\"multipart/form-data\">\n".
+		"<form method=\"post\" action=\"".$str_this_script."?mode=upload\" enctype=\"multipart/form-data\">\n".
 		"<p>対象ファイルを指定します<br />\n".
 		"&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"file\" name=\"uploadfile\" value=\"\" size=\"50\" /><br />\n".
 		"&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"checkbox\" name=\"overwrite\" value=\"enable\" ".($flag_overwrite == 1 ? "checked=\"checked\"" : '')." />既存ファイルが存在しても上書きする</p>\n".
@@ -266,7 +275,7 @@ sub sub_disp_home{
 
 	for(my $i=0; $i<=$#arr_updirs; $i++){
 		print("&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"dir\" value=\"".$i."\" ".($i==0 ? "checked=\"checked\"" : '').
-			" />$arr_updirs[$i]".($i==$#arr_updirs ? '</p>' : '<br />')."\n");
+			" />".sub_conv_to_flagged_utf8($arr_updirs[$i],'utf8').($i==$#arr_updirs ? '</p>' : '<br />')."\n");
 	}
 	
 	print("<div class=\"inbox\">\n".
@@ -291,6 +300,7 @@ sub sub_disp_home{
 
 }
 
+
 # アップロード
 sub sub_upload{
 	my $q_ref = shift;
@@ -301,10 +311,12 @@ sub sub_upload{
 	our @arr_updirs;
 	
 	my $flag_is_image = 0;	# 画像の場合 1
-	my $str_filename = $$q_ref->param('uploadfile');
-	print("<!--Uploaded Filename = ".encode_entities($str_filename)." -->\n");
 
-	print("<h1>File Information (ファイル情報)</h1>\n");
+	print("<h1>Upload File Information (ファイル情報)</h1>\n");
+	
+	# アップロードファイル名の取得
+	my $str_filename = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('uploadfile'), 'utf8'));
+	print("<!--Uploaded Filename = ".encode_entities($str_filename, '&<>\\\"\'')." -->\n");
 
 	# 入力条件のチェック
 	unless(defined($$q_ref->param('dir')) && length($$q_ref->param('dir'))>0 && 
@@ -316,7 +328,7 @@ sub sub_upload{
 	}
 
 	# 保存先ファイルの上書きチェック
-	my $str_save_filepath = $str_basedir . $arr_updirs[$$q_ref->param('dir')+0] . '/' . $str_filename;
+	my $str_save_filepath = $str_basedir . sub_conv_to_flagged_utf8($arr_updirs[$$q_ref->param('dir')+0],'utf8') . '/' . $str_filename;
 	if( -e $str_save_filepath){
 		if(!( -f $str_save_filepath )){
 			sub_error_exit("Error : 指定されたファイル名はディレクトリなどの名前で使われています");
@@ -333,28 +345,26 @@ sub sub_upload{
 		}
 	}
 
-	# アップロードファイルの取り込み
+	# アップロードファイルの取り込み（一時ファイルに言ったん保存し、それを最終ディレクトリに移動する）
 	my $fh = $$q_ref->upload('uploadfile');
 	my $str_temp_filepath = $$q_ref->tmpFileName($fh);
-
 	print("<!-- Temporary Fileneme = ".$str_temp_filepath." -->\n");
-
 	File::Copy::move($str_temp_filepath, $str_save_filepath) or sub_error_exit("Error : ".$str_save_filepath."への移動処理失敗");
-
 	close($fh);
 
 	unless( -f $str_save_filepath ){ sub_error_exit("Error : 保存後の ".$str_save_filepath." の存在が検知できない"); }
 
 	print "<p class=\"ok\">ファイル ".$str_filename." のアップロードが完了しました</p>\n";
 
+	# ログファイルに記録する
 	sub_write_log($arr_updirs[$$q_ref->param('dir')+0] . '/' . $str_filename);
-
+	# ファイル情報を画面表示する
 	sub_disp_file_code($q_ref, $$q_ref->param('dir')+0, $str_filename);
 
 }
 
 
-# 指定されたファイルのHTMLコード例を表示する
+# 指定されたファイルのHTMLコード例を画面表示する
 sub sub_disp_file_code {
 	my $q_ref = shift;
 	my $updirs_index = shift;	# 利用する @arr_updirs のインデックス
@@ -366,9 +376,8 @@ sub sub_disp_file_code {
 	our $str_basedir;
 	our @arr_updirs;
 
-	my $filepath = $str_basedir . $arr_updirs[$updirs_index] . '/' . $filename;
+	my $filepath = $str_basedir . sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8') . '/' . $filename;
 	my $flag_is_image = 0;	# 画像かどうかの判定結果 0:画像でない。1:画像
-
 
 	# ファイルが読み込み可能かチェック
 	unless( -f $filepath && -r $filepath){
@@ -472,26 +481,26 @@ sub sub_disp_file_code {
 		
 		# 貼り付け用コード例を画面表示する
 		print("<pre class=\"fold\">\n".
-				"&lt;a href=\"".encode_entities($arr_updirs[$updirs_index]."/".$filename)."\"".
+				"&lt;a href=\"".encode_entities(sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"".
 				($flag_target == 1 ? ' target="_blank"' : '')."&gt;".
-				"&lt;img src=\"".encode_entities($arr_updirs[$updirs_index]."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
+				"&lt;img src=\"".encode_entities(sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
 				"alt=\"".$alt."\" ".(defined($title) ? 'title="'.$title.'"' : '')." /&gt;".
 				"&lt;/a&gt;\n".
 				"</pre>\n");
 		# 貼り付け用コード例を画面表示する
 		print("<pre class=\"fold\">\n".
-				"&lt;a href=\"".encode_entities($str_webaddr.$arr_updirs[$updirs_index]."/".$filename)."\"".
+				"&lt;a href=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"".
 				($flag_target == 1 ? ' target="_blank"' : '')."&gt;".
-				"&lt;img src=\"".encode_entities($str_webaddr.$arr_updirs[$updirs_index]."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
+				"&lt;img src=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
 				"alt=\"".$alt."\" ".(defined($title) ? 'title="'.$title.'"' : '')." /&gt;".
 				"&lt;/a&gt;\n".
 				"</pre>\n");
 		
 		# 貼り付け用コードの描画例を表示する
 		print("<p>Web上での表示例</p>\n".
-				"<p><a href=\"".$arr_updirs[$updirs_index]."/".$filename."\"".
+				"<p><a href=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"".
 				($flag_target == 1 ? ' target="_blank"' : '').">".
-				"<img src=\"".$arr_updirs[$updirs_index]."/".$filename."\" width=\"".$x."\" height=\"".$y."\" ".
+				"<img src=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
 				"alt=\"".encode_entities($alt, '&<>\\\"\'')."\" ".(defined($title) ? 'title="'.$title.'"' : '')." />".
 				"</a></p>\n");
 		
@@ -499,19 +508,19 @@ sub sub_disp_file_code {
 	else{
 		# 貼り付け用コード例を画面表示する
 		print("<pre class=\"fold\">\n".
-			"&lt;a href=\"".$arr_updirs[$updirs_index]."/".$filename."\"&gt;".
+			"&lt;a href=\"".encode_entities(sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"&gt;".
 			$filename."をダウンロードする&lt;/a&gt;\n".
 			"</pre>\n");
 
 		# 貼り付け用コード例を画面表示する
 		print("<pre class=\"fold\">\n".
-			"&lt;a href=\"".$str_webaddr.$arr_updirs[$updirs_index]."/".$filename."\"&gt;".
+			"&lt;a href=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"&gt;".
 			$filename."をダウンロードする&lt;/a&gt;\n".
 			"</pre>\n");
 		
 		# 貼り付け用コードの描画例を表示する
 		print("<p>Web上での表示例</p>\n".
-			"<p><a href=\"".$arr_updirs[$updirs_index]."/".$filename."\">".
+			"<p><a href=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\">".
 			$filename."をダウンロードする</a></p>\n");
 	}
 
@@ -519,6 +528,7 @@ sub sub_disp_file_code {
 }
 
 
+# 指定されたファイル情報を表示する
 sub sub_fileinfo {
 	my $q_ref = shift;
 
@@ -539,7 +549,7 @@ sub sub_fileinfo {
 	unless(defined($$q_ref->param('filename')) && length($$q_ref->param('filename'))>0){
 		sub_error_exit("Error : ファイル名が指定されていない");
 	}
-	$filename = $$q_ref->param('filename');
+	$filename = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('filename'), 'utf8'));
 	if($filename =~ m#[\x00-\x1f]|/|<|>|&|\*|\"|\'#){
 		sub_error_exit("Error : ファイル名に利用できない文字が含まれています");
 	}
@@ -550,6 +560,7 @@ sub sub_fileinfo {
 }
 
 
+# アップロード先ディレクトリ内のファイル一覧を表示
 sub sub_list {
 	my $q_ref = shift;
 	my $updirs_index = shift;	# 利用する @arr_updirs のインデックス
@@ -567,7 +578,7 @@ sub sub_list {
 			!($$q_ref->param('mask') =~ m#/|<|>|&|!|\"|\'|%#)){
 			$search_mask = $$q_ref->param('mask');
 		}
-		my @arr_filelist = glob($str_basedir.$arr_updirs[$updirs_index].'/'.$search_mask);
+		my @arr_filelist = glob($str_basedir.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index+0],'utf8').'/'.$search_mask);
 		if(defined($$q_ref->param('sort'))){
 			if($$q_ref->param('sort') eq 'fname_asc'){ @arr_filelist = sort @arr_filelist; }
 			if($$q_ref->param('sort') eq 'fname_desc'){ @arr_filelist = sort { $b cmp $a } @arr_filelist; }
@@ -578,10 +589,11 @@ sub sub_list {
 				print("ファイル数が100個を超えたので、以降省略します<br />\n");
 				last;
 			}
-			$filename = $arr_filelist[$i];
+			$filename = encode_entities(sub_conv_to_flagged_utf8($arr_filelist[$i], 'utf8'), '&<>\\\"\'');
 			my @filestat = stat($filename);
 			my ($sec,$min,$hour,$day,$mon,$year) = localtime($filestat[9]);
-			my $str_timestamp = sprintf("%10d %04d-%02d-%02d %02d:%02d:%02d", $filestat[7], $year+1900, $mon+1, $day, $hour, $min, $sec);
+			my $str_attr = Stat::lsMode::format_mode($filestat[2]);
+			my $str_timestamp = sprintf("%s %10d %04d-%02d-%02d %02d:%02d:%02d", $str_attr, $filestat[7], $year+1900, $mon+1, $day, $hour, $min, $sec);
 			print($str_timestamp." <a href=\"$str_this_script?mode=fileinfo&amp;dir=".($updirs_index+0)."&filename=".basename($filename)."\">".basename($filename)."</a>\n");
 		}
 		print("</pre>\n");
@@ -591,7 +603,7 @@ sub sub_list {
 			"<p>一覧を表示するディレクトリを選択します<br />\n");
 		for(my $i=0; $i<=$#arr_updirs; $i++){
 			print("&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"dir\" value=\"".$i."\" ".($i==0 ? "checked=\"checked\"" : '').
-				" />$arr_updirs[$i]".($i==$#arr_updirs ? '</p>' : '<br />')."\n");
+				" />".sub_conv_to_flagged_utf8($arr_updirs[$i],'utf8').($i==$#arr_updirs ? '</p>' : '<br />')."\n");
 		}
 		print("<p>検索条件を設定します<br />\n".
 			"&nbsp;&nbsp;&nbsp;&nbsp;ファイル検索マスク : <input type=\"text\" name=\"mask\" value=\"*\" size=\"30\" /><br />\n".
@@ -605,6 +617,8 @@ sub sub_list {
 
 }
 
+
+# 以下、他のスクリプトと同一の共通関数
 
 # 任意の文字コードの文字列を、UTF-8フラグ付きのUTF-8に変換する
 sub sub_conv_to_flagged_utf8{
