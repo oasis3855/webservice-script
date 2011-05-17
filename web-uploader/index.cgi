@@ -47,18 +47,18 @@ use HTML::Entities;
 use Stat::lsMode qw/format_mode/;	# ファイル属性を -rwxr-xr-x のように整形する
 
 # 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
-require ((getpwuid($<))[7]).'/auth/script/auth_md5_utf8.pl';    # 認証システム
+require ((getpwuid($<))[7]).'/auth/auth.pl';    # 認証システム
 
 my $flag_os = 'linux';	# linux/windows
 my $flag_charcode = 'utf8';		# utf8/shiftjis
 # IOの文字コードを規定
 if($flag_charcode eq 'utf8'){
-	binmode(STDIN, ":utf8");
+#	binmode(STDIN, ":utf8");	# コンソール入力があるコマンドライン版の時
 	binmode(STDOUT, ":utf8");
 	binmode(STDERR, ":utf8");
 }
 if($flag_charcode eq 'shiftjis'){
-	binmode(STDIN, "encoding(sjis)");
+#	binmode(STDIN, "encoding(sjis)");	# コンソール入力があるコマンドライン版の時
 	binmode(STDOUT, "encoding(sjis)");
 	binmode(STDERR, "encoding(sjis)");
 }
@@ -68,57 +68,60 @@ my $str_fpath_log = './log/log.txt';		# ログファイル
 
 my $str_this_script = basename($0);		# このスクリプト自身のファイル名
 
-my $q = new CGI;
+main();
+exit;
 
-# 必要なディレクトリ、ファイルが存在するかチェックする。
-sub_check_files(\$q);
+sub main{
+	my $q = new CGI;
 
-# 初期設定ファイルの読み込み
-require $str_fpath_config;
+	# 必要なディレクトリ、ファイルが存在するかチェックする。
+	sub_check_files(\$q);
 
-# 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
-# 認証状態のチェック（認証されていない場合は、認証画面を表示する）
-sub_check_auth($str_this_script, 'web-uploader', 0);
-# ログオフの場合
-if(defined($q->url_param('mode')) && $q->url_param('mode') eq 'logoff'){
-                sub_logoff_auth($str_this_script, 1);   # ログオフしてスクリプト終了
-}
-#### 認証システム利用ここまで
+	# 初期設定ファイルの読み込み
+	require $str_fpath_config;
 
-
-# HTML出力を開始する
-sub_print_start_html(\$q);
-
-
-# 処理内容に合わせた処理と、画面表示
-if(defined($q->url_param('mode'))){
-	if($q->url_param('mode') eq 'upload' && defined($q->param('uploadfile')) && length($q->param('uploadfile'))>0){
-		sub_upload(\$q);
+	# 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
+	# 認証状態のチェック（認証されていない場合は、認証画面を表示する）
+	sub_check_auth($str_this_script, 'web-uploader', 0);
+	# ログオフの場合
+	if(defined($q->url_param('mode')) && $q->url_param('mode') eq 'logoff'){
+					sub_logoff_auth($str_this_script, 0);   # ログオフしてスクリプト終了
 	}
-	elsif($q->url_param('mode') eq 'fileinfo'){
-		sub_fileinfo(\$q);
-	}
-	elsif($q->url_param('mode') eq 'viewlog'){
-		sub_view_log(\$q);
-	}
-	elsif($q->url_param('mode') eq 'listmenu'){
-		sub_list(\$q);
-	}
-	elsif($q->url_param('mode') eq 'listdir'){
-		sub_list(\$q, $q->param('dir'));
+	#### 認証システム利用ここまで
+
+	# HTML出力を開始する
+	sub_print_start_html(\$q);
+
+
+	# 処理内容に合わせた処理と、画面表示
+	if(defined($q->url_param('mode'))){
+		if($q->url_param('mode') eq 'upload' && defined($q->param('uploadfile')) && length($q->param('uploadfile'))>0){
+			sub_upload(\$q);
+		}
+		elsif($q->url_param('mode') eq 'fileinfo'){
+			sub_fileinfo(\$q);
+		}
+		elsif($q->url_param('mode') eq 'viewlog'){
+			sub_view_log(\$q);
+		}
+		elsif($q->url_param('mode') eq 'listmenu'){
+			sub_list(\$q);
+		}
+		elsif($q->url_param('mode') eq 'listdir'){
+			sub_list(\$q, $q->param('dir'));
+		}
+		else{
+			print("<p class=\"error\">プログラムが意図しない方法で起動されました</p>\n");
+		}
 	}
 	else{
-		print("<p class=\"error\">プログラムが意図しない方法で起動されました</p>\n");
+		sub_disp_home();
 	}
-}
-else{
-	sub_disp_home();
-}
 
-# HTML出力を閉じる（フッタ部分の表示）
-sub_print_close_html();
+	# HTML出力を閉じる（フッタ部分の表示）
+	sub_print_close_html();
 
-exit;
+}
 
 
 # htmlを開始する（HTML構文を開始して、ヘッダを表示する）
@@ -174,7 +177,8 @@ print << '_EOT_FOOTER';
 </div>	<!-- id="footer" --> 
 _EOT_FOOTER
 
-	print $q->end_html;
+#	print $q->end_html;
+	print("</body>\n</html>\n");
 }
 
 # エラー終了時に呼ばれるsub
@@ -240,6 +244,7 @@ sub sub_write_log {
 	$hostname = sub_conv_to_safe_str($hostname, 255);
 
 	open(FH, '>>'.$str_fpath_log) or sub_error_exit("Error : ログファイル ".$str_fpath_log . " に書き込めません");
+	binmode(FH, ':utf8');
 	printf(FH "%04d/%02d/%02d,%02d:%02d:%02d,%s,%s,%s\n", $year+1900, $mon+1, $day, $hour, $min, $sec, $ip, $hostname, $str);
 	close(FH);
 
@@ -313,7 +318,7 @@ sub sub_upload{
 	my $flag_is_image = 0;	# 画像の場合 1
 
 	print("<h1>Upload File Information (ファイル情報)</h1>\n");
-	
+
 	# アップロードファイル名の取得
 	my $str_filename = sub_conv_to_flagged_utf8(decode_entities($$q_ref->param('uploadfile'), 'utf8'));
 	print("<!--Uploaded Filename = ".encode_entities($str_filename, '&<>\\\"\'')." -->\n");
@@ -357,7 +362,7 @@ sub sub_upload{
 	print "<p class=\"ok\">ファイル ".$str_filename." のアップロードが完了しました</p>\n";
 
 	# ログファイルに記録する
-	sub_write_log($arr_updirs[$$q_ref->param('dir')+0] . '/' . $str_filename);
+	sub_write_log(sub_conv_to_flagged_utf8($arr_updirs[$$q_ref->param('dir')+0],'utf8') . '/' . $str_filename);
 	# ファイル情報を画面表示する
 	sub_disp_file_code($q_ref, $$q_ref->param('dir')+0, $str_filename);
 
@@ -389,7 +394,7 @@ sub sub_disp_file_code {
 	if($filename =~ m/.gif$|.jpg$|.jpeg$|.png$/i){
 		@arr_imgsize = Image::Size::imgsize($filepath);
 	}
-	if($arr_imgsize[0] == undef || $arr_imgsize[1] == undef || $arr_imgsize[0] == 0 || $arr_imgsize[1] == 0){
+	if(!defined($arr_imgsize[0]) || !defined($arr_imgsize[1]) || $arr_imgsize[0] == 0 || $arr_imgsize[1] == 0){
 		# 画像でない
 		$flag_is_image = 0;
 	}
@@ -471,7 +476,7 @@ sub sub_disp_file_code {
 		"&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"h\" />横\n".
 		"&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"off\" />OFF（実寸）</td></tr>\n".
 		"<tr><td>alt属性値</td><td><input type=\"text\" name=\"alt\" value=\"".$alt."\" size=\"30\" />&nbsp;<input type=\"checkbox\" name=\"alt_fname\" value=\"enable\" checked=\"checked\" />空欄の時はファイル名を利用</td></tr>\n".
-		"<tr><td>title属性値</td><td><input type=\"text\" name=\"title\" value=\"".$title."\" size=\"30\" /> (空欄の時は属性削除) </td></tr>\n".
+		"<tr><td>title属性値</td><td><input type=\"text\" name=\"title\" value=\"".(defined($title) ? $title : '')."\" size=\"30\" /> (空欄の時は属性削除) </td></tr>\n".
 		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く</td></tr>\n".
 		#####
 		"</table>\n".
