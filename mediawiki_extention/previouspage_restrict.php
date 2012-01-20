@@ -12,7 +12,7 @@ if (!defined('MEDIAWIKI')) die("MediaWiki extensions cannot be run directly.");
 $wgExtensionCredits['other'][] = array(
     'name' => "previouspage_restrict_extention",
     'author' => "INOUE. Hirokazu",
-    'version' => "1.1 (2012/Jan/20) for mw 1.13",
+    'version' => "1.2 (2012/Jan/20) for mw 1.18",
     'description' => "prohibit to open previous pages fo non-logon user",
     'url' => "http://oasis.halfmoon.jp/mw/index.php?title=Soft-MediaWiki-PreviouspageRestrict-Ext",
 );
@@ -46,18 +46,19 @@ class previouspage_restrict {
         }
  
         # if not defined oldid(previous page) and not history mode, do nothing (return)
-        if(empty($wgRequest->data['oldid'])) {
-            if(empty($wgRequest->data['action'])) {
+        # 履歴モード以外の場合は、このプログラムを抜ける 
+        if($wgRequest->getVal('oldid') == NULL) {
+            if($wgRequest->getVal('action') == NULL) {
                 return true;
             }
-            else if($wgRequest->data['action'] != 'history'){
+            else if($wgRequest->getVal('action') != 'history'){
                 return true;
             }
         }
- 
-        # if prohibited previous page, display error message insted of Wiki article
-        # show error screen, message is defined at languages/messages/MessagesXX.php
-        $wgOut->showErrorPage( 'notloggedin', 'prefsnologintext' );
+
+        # if prohibited Special: page, display error message insted of Wiki article
+        # (制限ページに合致した場合、エラーメッセージを表示する)
+        $wgOut->showErrorPage( 'errorpagetitle', 'notloggedin' );
         # set contentSub
         $wgOut->setSubtitle( 'topic history is not available' );
  

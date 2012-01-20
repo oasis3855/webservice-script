@@ -12,7 +12,7 @@ if (!defined('MEDIAWIKI')) die("MediaWiki extensions cannot be run directly.");
 $wgExtensionCredits['other'][] = array(
     'name' => "specialpage_restrict_extention",
     'author' => "INOUE. Hirokazu",
-    'version' => "1.1 (2012/Jan/20) for mw 1.13",
+    'version' => "1.2 (2012/Jan/20) for mw 1.18",
     'description' => "prohibit to open special pages fo non-logon user",
     'url' => "http://oasis.halfmoon.jp/mw/index.php?title=Soft-MediaWiki-SpecialpageRestrict-Ext",
 );
@@ -58,7 +58,6 @@ class specialpage_restrict {
         $arrAllowTitle = array(SpecialPage::getTitleFor( 'Userlogin' ), SpecialPage::getTitleFor( 'Userlogout' ));  # array of AllowedTitles
         # check Allowed Titles (許可されたページかどうか判別する)
         foreach($arrAllowTitle as $sAllowTitle) {
-#            if($wgTitle->mTextform == $sAllowTitle) {      # before MediaWiki ver 1.13
             if($wgTitle->mPrefixedText == $sAllowTitle) {
                 # Allowed Title
                 $bAllowed = true;
@@ -69,7 +68,9 @@ class specialpage_restrict {
         # (制限ページに合致した場合、エラーメッセージを表示する)
         if($bAllowed == false) {
             # show error screen, message is defined at languages/messages/MessagesXX.php
-            $wgOut->showErrorPage( 'notloggedin', 'prefsnologintext' );
+            $wgOut->showErrorPage( 'errorpagetitle', 'notloggedin' );
+            # set contentSub
+            $wgOut->setSubtitle( 'special page is not available' );
         }
  
         return true;
