@@ -55,7 +55,7 @@ class specialpage_restrict {
         $bAllowed = false;  # this is set true, if matched to AllowTitles
 
         # Special:ページのうち、ログイン、ログアウトページのみは許可する
-        $arrAllowTitle = array(SpecialPage::getTitleFor( 'Userlogin' ), SpecialPage::getTitleFor( 'Userlogout' ));  # array of AllowedTitles
+        $arrAllowTitle = array(SpecialPage::getTitleFor( 'Userlogin' ), SpecialPage::getTitleFor( 'Userlogout' ), SpecialPage::getTitleFor( 'RecentChanges' ));  # array of AllowedTitles
         # check Allowed Titles (許可されたページかどうか判別する)
         foreach($arrAllowTitle as $sAllowTitle) {
             if($wgTitle->mPrefixedText == $sAllowTitle) {
