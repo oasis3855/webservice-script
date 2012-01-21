@@ -49,10 +49,10 @@ class previouspage_restrict {
         # 履歴モード以外の場合は、このプログラムを抜ける 
         if($wgRequest->getVal('oldid') == NULL) {
             if($wgRequest->getVal('action') == NULL) {
-                return true;
+                return true;    # 履歴モードで無い場合
             }
-            else if($wgRequest->getVal('action') != 'history'){
-                return true;
+            else if($wgRequest->getVal('action') != 'history' && $wgRequest->getVal('action') != 'edit'){
+                return true;    # 履歴一覧または編集画面で無い場合
             }
         }
 
