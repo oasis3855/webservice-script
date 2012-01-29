@@ -12,7 +12,7 @@ if (!defined('MEDIAWIKI')) die("MediaWiki extensions cannot be run directly.");
 $wgExtensionCredits['other'][] = array(
     'name' => "specialpage_restrict_extention",
     'author' => "INOUE. Hirokazu",
-    'version' => "1.2 (2012/Jan/20) for mw 1.18",
+    'version' => "1.3 (2012/Jan/29) for mw 1.18",
     'description' => "prohibit to open special pages fo non-logon user",
     'url' => "http://oasis.halfmoon.jp/mw/index.php?title=Soft-MediaWiki-SpecialpageRestrict-Ext",
 );
@@ -47,8 +47,8 @@ class specialpage_restrict {
         }
  
         # if not Special:, do nothing (return) (Special:ページとUser:ページ以外では何もしない)
-        if($wgTitle->mNamespace != NS_SPECIAL && $wgTitle->mNamespace != NS_USER) {
-            # NS_SPECIAL, NS_USER is defined at includes/Defines.php
+        if($wgTitle->mNamespace == NS_MAIN || $wgTitle->mNamespace == NS_FILE || $wgTitle->mNamespace == NS_CATEGORY) {
+            # NS_MAIN, NS_SPECIAL ... is defined at includes/Defines.php
             return true;
         }
  
