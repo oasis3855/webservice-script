@@ -12,7 +12,7 @@ if (!defined('MEDIAWIKI')) die("MediaWiki extensions cannot be run directly.");
 $wgExtensionCredits['other'][] = array(
     'name' => "specialpage_restrict_extention",
     'author' => "INOUE. Hirokazu",
-    'version' => "1.3 (2012/Jan/29) for mw 1.18",
+    'version' => "1.4 (2012/Feb/02) for mw 1.18",
     'description' => "prohibit to open special pages fo non-logon user",
     'url' => "http://oasis.halfmoon.jp/mw/index.php?title=Soft-MediaWiki-SpecialpageRestrict-Ext",
 );
@@ -33,13 +33,6 @@ class specialpage_restrict {
     function wfMainHookFunction(&$page) {
         global $wgOut, $wgUser, $wgTitle;       # use global object
 
-        ### for debug
-        # echo "<!-- <pre>\n";
-        # print_r($wgUser);
-        # print_r($wgTitle);
-        # echo "\n</pre> -->\n";
-        ### for debug
- 
         # if Loggedin, do nothing (return) (ログイン済みの時は何もしない)
         if($wgUser->isLoggedIn()) {
             # isLoggedin() is defined includes/User.php
@@ -52,17 +45,16 @@ class specialpage_restrict {
             return true;
         }
  
-        $bAllowed = false;  # this is set true, if matched to AllowTitles
-
-        # Special:ページのうち、ログイン、ログアウトページのみは許可する
-        $arrAllowTitle = array(SpecialPage::getTitleFor( 'Userlogin' ), SpecialPage::getTitleFor( 'Userlogout' ), SpecialPage::getTitleFor( 'RecentChanges' ));  # array of AllowedTitles
-        # check Allowed Titles (許可されたページかどうか判別する)
-        foreach($arrAllowTitle as $sAllowTitle) {
-            if($wgTitle->mPrefixedText == $sAllowTitle) {
-                # Allowed Title
-                $bAllowed = true;
+        # Namespace = SPECIAL (特別: ページのとき)
+        if($wgTitle->mNamespace == NS_SPECIAL){
+            # allow LOGIN and LOGOUT (ログイン、ログアウトを許可)
+            if($wgTitle->mPrefixedText == SpecialPage::getTitleFor('Userlogin') ||
+                $wgTitle->mPrefixedText == SpecialPage::getTitleFor('Userlogout')){
+                return true;
             }
+            # Atom/rss はWebページ出力でないため、ここの設定にかかわらず通過する
         }
+
  
         # if prohibited Special: page, display error message insted of Wiki article
         # (制限ページに合致した場合、エラーメッセージを表示する)
