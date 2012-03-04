@@ -281,7 +281,7 @@ sub sub_list_db{
 		$dbh = DBI->connect($str_dsn, "", "", {PrintError => 0, AutoCommit => 1}) or die("DBI open error : ".$DBI::errstr);
 
 		# TBL_ADDRBOOKの全データを読み出す
-		my $str_sql = "select * from TBL_PLS";
+		my $str_sql = "select * from TBL_PLS ORDER BY title";
 		my $sth = $dbh->prepare($str_sql) or die("DBI prepare error : ".$DBI::errstr);
 		$sth->execute() or die("DBI execute error : ".$DBI::errstr);
 		print("<ul>\n");
@@ -644,7 +644,7 @@ sub sub_download_csv{
 		$sth = undef;
 		
 		# 全行のデータを読み出す
-		$str_sql = "select title,file,length from TBL_PLS order by idx";
+		$str_sql = "select title,file,length from TBL_PLS order by title";
 		$sth = $dbh->prepare($str_sql) or die($DBI::errstr);
 		$sth->execute() or die($DBI::errstr);
 
