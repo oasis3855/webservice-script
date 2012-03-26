@@ -294,7 +294,7 @@ sub sub_disp_home{
 		"&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"off\" />OFF（実寸）</td></tr>\n".
 		"<tr><td>alt属性値</td><td><input type=\"text\" name=\"alt\" value=\"\" size=\"30\" />&nbsp;<input type=\"checkbox\" name=\"alt_fname\" value=\"enable\" checked=\"checked\" />空欄の時はファイル名を利用</td></tr>\n".
 		"<tr><td>title属性値</td><td><input type=\"text\" name=\"title\" value=\"\" size=\"30\" /> (空欄の時は属性削除) </td></tr>\n".
-		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く</td></tr>\n".
+		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く&nbsp;&nbsp;<input type=\"checkbox\" name=\"fancybox\" value=\"on\" checked=\"checked\" />fancybox対応（&lt;a rel=... title=...&gt;）</td></tr>\n".
 		#####
 		"</table>\n".
 		"</div>\n".
@@ -462,6 +462,12 @@ sub sub_disp_file_code {
 			$flag_target = 1;
 		}
 		
+		# fancybox対応（<a>タグにrel="lightbox_group"とtitle="..."を追加）
+		my $flag_fancybox = 0;
+		if(defined($$q_ref->param('fancybox')) && length($$q_ref->param('fancybox'))>0 && $$q_ref->param('fancybox') eq 'on'){
+			$flag_fancybox = 1;
+		}
+		
 
 	print("<form method=\"post\" action=\"".$str_this_script."?mode=fileinfo\" class=\"inbox\">\n".
 		"<table border=\"0\">\n".
@@ -477,7 +483,7 @@ sub sub_disp_file_code {
 		"&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"off\" />OFF（実寸）</td></tr>\n".
 		"<tr><td>alt属性値</td><td><input type=\"text\" name=\"alt\" value=\"".$alt."\" size=\"30\" />&nbsp;<input type=\"checkbox\" name=\"alt_fname\" value=\"enable\" checked=\"checked\" />空欄の時はファイル名を利用</td></tr>\n".
 		"<tr><td>title属性値</td><td><input type=\"text\" name=\"title\" value=\"".(defined($title) ? $title : '')."\" size=\"30\" /> (空欄の時は属性削除) </td></tr>\n".
-		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く</td></tr>\n".
+		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く&nbsp;&nbsp;<input type=\"checkbox\" name=\"fancybox\" value=\"on\" checked=\"checked\" />fancybox対応（&lt;a rel=... title=...&gt;）</td></tr>\n".
 		#####
 		"</table>\n".
 		"<input type=\"submit\" value=\"表示条件を変更して再表示する\" />\n".
@@ -487,6 +493,8 @@ sub sub_disp_file_code {
 		# 貼り付け用コード例を画面表示する
 		print("<pre class=\"fold\">\n".
 				"&lt;a href=\"".encode_entities(sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"".
+				($flag_fancybox == 1 ? ' rel="lightbox_group"' : '').
+				($flag_fancybox == 1 && defined($title) ? ' title="'.$title.'"' : '').
 				($flag_target == 1 ? ' target="_blank"' : '')."&gt;".
 				"&lt;img src=\"".encode_entities(sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
 				"alt=\"".$alt."\" ".(defined($title) ? 'title="'.$title.'"' : '')." /&gt;".
@@ -495,6 +503,8 @@ sub sub_disp_file_code {
 		# 貼り付け用コード例を画面表示する
 		print("<pre class=\"fold\">\n".
 				"&lt;a href=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\"".
+				($flag_fancybox == 1 ? ' rel="lightbox_group"' : '').
+				($flag_fancybox == 1 && defined($title) ? ' title="'.$title.'"' : '').
 				($flag_target == 1 ? ' target="_blank"' : '')."&gt;".
 				"&lt;img src=\"".encode_entities($str_webaddr.sub_conv_to_flagged_utf8($arr_updirs[$updirs_index],'utf8')."/".$filename)."\" width=\"".$x."\" height=\"".$y."\" ".
 				"alt=\"".$alt."\" ".(defined($title) ? 'title="'.$title.'"' : '')." /&gt;".
