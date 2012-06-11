@@ -41,7 +41,7 @@ use lib ((getpwuid($<))[7]).'/local/lib/perl5/site_perl/5.8.9/mach';         # �
 use CGI;
 use File::Basename;
 use File::Copy;
-use DBI; 
+use DBI;
 use Text::CSV_XS;
 use Data::Dumper;
 use Encode::Guess qw/euc-jp shiftjis iso-2022-jp/;	# 必要ないエンコードは削除すること
@@ -81,6 +81,10 @@ sub_check_files(\$q);
 if(defined($q->url_param('mode'))){
 	if($q->url_param('mode') eq 'download_pls'){
 		sub_download_csv(\$q, 'pls', 'download');
+		exit;
+	}
+	elsif($q->url_param('mode') eq 'download_pls_ft'){
+		sub_download_csv(\$q, 'pls_ft', 'download');
 		exit;
 	}
 	elsif($q->url_param('mode') eq 'download_csv'){
@@ -606,21 +610,22 @@ sub sub_add_to_db{
 sub sub_disp_download{
 	print("<h1>Download CSV datafile (CSVファイルのダウンロード)</h1>\n");
 	
-	print("<ul>\n<li><a href=\"".$str_this_script."?mode=download_pls\">PLS形式でダウンロード</a></li>\n".
+	print("<ul>\n<li><a href=\"".$str_this_script."?mode=download_pls\">PLS形式でダウンロード（title,file順）</a></li>\n".
+		"<li><a href=\"".$str_this_script."?mode=download_pls_ft\">PLS形式でダウンロード（file,title順）</a></li>\n".
 		"<li><a href=\"".$str_this_script."?mode=download_csv\">CSV形式でダウンロード</a></li>\n</ul>\n");
 }
 
 # CSVのダウンロード
 sub sub_download_csv{
 	my $q_ref = shift;
-	my $csv_mode = shift;	# 出力形式（pls, csv）
+	my $csv_mode = shift;	# 出力形式（pls, pls_ft, csv）
 	my $output_mode = shift;	# 出力モード（download, $backup_filepath）
 
 	my $str_filepath_backup = $output_mode;		# バックアップ時はファイル名
 
 	# ダウンロード用のヘッダを出力
 	if($output_mode eq 'download'){
-		if($csv_mode eq 'pls'){
+		if($csv_mode eq 'pls' || $csv_mode eq 'pls_ft'){
 			print $$q_ref->header(-type=>'application/octet-stream', -attachment=>'playlist.pls');
 		}
 		else{
@@ -659,7 +664,7 @@ sub sub_download_csv{
 			else{ print(FH "title,file,length\n"); }
 		}
 		# Playlistヘッダ出力
-		if($csv_mode eq 'pls'){
+		if($csv_mode eq 'pls' || $csv_mode eq 'pls_ft'){
 			if($output_mode eq 'download'){ print("[playlist]\nnumberofentries=".$arr_rows[0]."\n\n"); }
 			else{ print(FH "[playlist]\nnumberofentries=".$arr_rows[0]."\n\n"); }
 		}
@@ -678,9 +683,14 @@ sub sub_download_csv{
 				$csv->combine(@arr);
 				$str = $csv->string() . "\n";
 			}
-			else{
+			elsif($csv_mode eq 'pls'){
 				$str = sprintf("Title%d=%s\nFile%d=%s\nLength%d=%s\n\n",
 						$i, $arr[0], $i, $arr[1], $i, $arr[2]);
+				$i++;
+			}
+			elsif($csv_mode eq 'pls_ft'){
+				$str = sprintf("File%d=%s\nTitle%d=%s\nLength%d=%s\n\n",
+						$i, $arr[1], $i, $arr[0], $i, $arr[2]);
 				$i++;
 			}
 			
@@ -689,7 +699,7 @@ sub sub_download_csv{
 		}
 
 		# Playlistフッタ出力
-		if($csv_mode eq 'pls'){
+		if($csv_mode eq 'pls' || $csv_mode eq 'pls_ft'){
 			if($output_mode eq 'download'){ print("Version=2\n"); }
 			else{ print(FH "Version=2\n"); }
 		}
