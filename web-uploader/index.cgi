@@ -9,6 +9,8 @@
 #
 # csv2html-thumb.pl
 # version 0.1 (2011/May/05)
+# version 0.1.1 (2012/Mar/26) : fancybox
+# version 0.1.2 (2012/Jun/18) : bugfix
 #
 # GNU GPL Free Software
 #
@@ -37,6 +39,7 @@ use utf8;
 use lib ((getpwuid($<))[7]).'/local/cpan/lib/perl5';    # ユーザ環境にCPANライブラリを格納している場合
 use lib ((getpwuid($<))[7]).'/local/lib/perl5';         # ユーザ環境にCPANライブラリを格納している場合
 use lib ((getpwuid($<))[7]).'/local/lib/perl5/site_perl/5.8.9/mach';         # ユーザ環境にCPANライブラリを格納している場合
+use lib ((getpwuid($<))[7]).'/local/lib/perl5/site_perl/5.8.9';         # ユーザ環境にCPANライブラリを格納している場合
 
 use CGI;
 use File::Basename;
@@ -173,7 +176,7 @@ print << '_EOT_FOOTER';
 <p>&nbsp;</p> 
 <div class="clear"></div> 
 <div id="footer"> 
-<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1 &nbsp;&nbsp; GNU GPL free software</p> 
+<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.2 &nbsp;&nbsp; GNU GPL free software</p> 
 </div>	<!-- id="footer" --> 
 _EOT_FOOTER
 
@@ -472,9 +475,10 @@ sub sub_disp_file_code {
 	print("<form method=\"post\" action=\"".$str_this_script."?mode=fileinfo\" class=\"inbox\">\n".
 		"<table border=\"0\">\n".
 		"<tr><td colspan=\"2\">webでの表現方法の設定</td></tr>\n".
-		"<tr><td>元画像の情報</td><td>横(x)=".$x0.", 縦(y)=".$y0.", サイズ=".( -s $filepath)." bytes</td></tr>\n".
+		"<tr><td>元画像の情報</td><td>横(x)=".$x0.", 縦(y)=".$y0.", サイズ=".( -s $filepath)." bytes\n".
+		"<!-- Control value : directory index, filename -->\n".
 		"<input type=\"hidden\" name=\"dir\" value=\"".$updirs_index."\" size=\"30\" />\n".
-		"<input type=\"hidden\" name=\"filename\" value=\"".$filename."\" size=\"30\" />\n".
+		"<input type=\"hidden\" name=\"filename\" value=\"".$filename."\" size=\"30\" /></td></tr>\n".
 		#####
 		"<tr><td>画像表示サイズ</td><td><input type=\"text\" name=\"size\" value=\"".$n_target_size."\" size=\"15\" /> (px) \n".
 		"&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"long\" checked=\"checked\" />長辺\n".
@@ -609,7 +613,7 @@ sub sub_list {
 			my ($sec,$min,$hour,$day,$mon,$year) = localtime($filestat[9]);
 			my $str_attr = Stat::lsMode::format_mode($filestat[2]);
 			my $str_timestamp = sprintf("%s %10d %04d-%02d-%02d %02d:%02d:%02d", $str_attr, $filestat[7], $year+1900, $mon+1, $day, $hour, $min, $sec);
-			print($str_timestamp." <a href=\"$str_this_script?mode=fileinfo&amp;dir=".($updirs_index+0)."&filename=".basename($filename)."\">".basename($filename)."</a>\n");
+			print($str_timestamp." <a href=\"$str_this_script?mode=fileinfo&amp;dir=".($updirs_index+0)."&amp;filename=".basename($filename)."\">".basename($filename)."</a>\n");
 		}
 		print("</pre>\n");
 	}
