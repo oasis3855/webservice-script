@@ -6,6 +6,7 @@
 //     http://oasis.halfmoon.jp/
 //
 // version 1.0 (2010/Feb/21)
+// version 1.1 (2010/Feb/23)
 //
 // GNU GPL Free Software
 //
@@ -25,6 +26,7 @@
 //
 // http://www.opensource.jp/gpl/gpl.ja.html
 // ******************************************************
+
 
 // スクリプトをリロードするための、このスクリプトの名前
 $strThisScriptName = htmlspecialchars(basename($_SERVER['PHP_SELF']));
@@ -61,6 +63,26 @@ else{
     // ログイン処理
     func_check_auth(basename($_SERVER['PHP_SELF']), basename($_SERVER['PHP_SELF']), 0);
 }
+
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS" />
+<title>Webファイルブラウザ</title>
+<style type="text/css">
+<!--
+a.file {
+	color: green;
+}
+-->
+</style>
+</head>
+<body>
+<p>Webファイルブラウザ (version 1.1)</p>
+<?php
+
 
 // 相対ディレクトリの決定（何も指定がないときは、ルート / ）
 $strRelDir = "/";
@@ -119,23 +141,8 @@ if($_POST['fix_width'])
 }
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" dir="ltr">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS" />
-<title>Webファイルブラウザ</title>
-<style type="text/css">
-<!--
-a.file {
-	color: green;
-}
--->
-</style>
-</head>
-<body>
-<p>Webファイルブラウザ (version 1.0)</p>
 
-<form method="post" action="<?php echo $strThisScriptName ?>">
+<form method="post" action="<?php echo basename($strThisScriptName) ?>">
 <p>表示したいディレクトリ ： <input type="text" name="target_dir" value="<?php echo htmlspecialchars($strRelDir) ?>" />
 <input type="submit" value="ファイル一覧を表示する" /></p>
 <p>画像の場合　長辺のピクセル数：<input type="text" size="5" name="fix_width" value="<?php echo $nFixWidth?>" /></p>
@@ -165,7 +172,7 @@ if(!$strRelFile)
 	{
 		if(is_dir($strTargetDir."/".$strTmp))
 		{
-			print("<tr><td><a class=\"dir\" href=\"".$strThisScriptName."?target_dir=".htmlspecialchars($strRelDir)."/".htmlspecialchars($strTmp)."\">".htmlspecialchars($strTmp)."</a></td>");
+			print("<tr><td><a class=\"dir\" href=\"".basename($strThisScriptName)."?target_dir=".htmlspecialchars($strRelDir)."/".htmlspecialchars($strTmp)."\">".htmlspecialchars($strTmp)."</a></td>");
 			print("<td>".attr_to_string(fileperms($strTargetDir."/".$strTmp))."</td>");
 			print("<td>&lt;ディレクトリ&gt;</td>");
 			print("<td>");
@@ -178,7 +185,7 @@ if(!$strRelFile)
 		}
 		else
 		{
-			print("<tr><td><a class=\"file\" href=\"".$strThisScriptName."?target_file=".htmlspecialchars($strRelDir)."/".htmlspecialchars($strTmp)."\">".htmlspecialchars($strTmp)."</a></td>");
+			print("<tr><td><a class=\"file\" href=\"".basename($strThisScriptName)."?target_file=".htmlspecialchars($strRelDir)."/".htmlspecialchars($strTmp)."\">".htmlspecialchars($strTmp)."</a></td>");
 			print("<td>".attr_to_string(fileperms($strTargetDir."/".$strTmp))."</td>");
 			print("<td>".number_format(filesize($strTargetDir."/".$strTmp))."</td>");
 			print("<td>");
@@ -232,7 +239,7 @@ else
 			print '<p><textarea name="full" rows="4" cols="70">&lt;a target="_blank" href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;&lt;img src="'.$strAbsolutePath.htmlspecialchars($strRelFile).'" border="0" width="'.$arrImgsize[0].'" height="'.$arrImgsize[1].'" alt="'.htmlspecialchars($strFileBody).'" /&gt;&lt;/a&gt;'."\n"."</textarea></p>\n";
 
 
-			print '<p><a target="_blank" href="'.htmlspecialchars($strRelFile).'"><img src="'.htmlspecialchars($strRelFile).'" border="0" width="'.$nWidth.'" height="'.$nHeight.'" alt="'.htmlspecialchars($strRelFile).'" /></a></p>'."\n";
+			print '<p><a target="_blank" href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"><img src="'.$strAbsolutePath.htmlspecialchars($strRelFile).'" border="0" width="'.$nWidth.'" height="'.$nHeight.'" alt="'.htmlspecialchars($strRelFile).'" /></a></p>'."\n";
 
 		}
 	}
@@ -242,7 +249,7 @@ else
 
 		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'を表示する&lt;/a&gt;'."\n"."</textarea></p>\n";
 
-		print '<p><a href="'.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."を表示する</a>\n";
+		print '<p><a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."を表示する</a>\n";
 
 	}
 	else
@@ -251,12 +258,14 @@ else
 
 		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'をダウンロードする&lt;/a&gt;'."\n"."</textarea></p>\n";
 
-		print '<p><a href="'.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."をダウンロードする</a>\n";
+		print '<p><a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."をダウンロードする</a>\n";
 	}
 
 }
 
 ?>
+
+<p><a href="./logoff.php">ログオフする</a></p>
 </body>
 </html>
 <?php
