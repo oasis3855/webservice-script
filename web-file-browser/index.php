@@ -1,6 +1,6 @@
 <?php
 // ******************************************************
-// Software name : Web File Browser iWeb ƒtƒ@ƒCƒ‹ƒuƒ‰ƒEƒUj
+// Software name : Web File Browser ï¼ˆWeb ãƒ•ã‚¡ã‚¤ãƒ«ãƒ–ãƒ©ã‚¦ã‚¶ï¼‰
 //
 // Copyright (C) INOUE Hirokazu, All Rights Reserved
 //     http://oasis.halfmoon.jp/
@@ -10,58 +10,58 @@
 //
 // GNU GPL Free Software
 //
-// ‚±‚ÌƒvƒƒOƒ‰ƒ€‚ÍƒtƒŠ[ƒ\ƒtƒgƒEƒFƒA‚Å‚·B‚ ‚È‚½‚Í‚±‚ê‚ğAƒtƒŠ[ƒ\ƒtƒgƒEƒFƒAà
-// ’c‚É‚æ‚Á‚Ä”­s‚³‚ê‚½ GNU ˆê”ÊŒöO—˜—p‹–‘øŒ_–ñ‘(ƒo[ƒWƒ‡ƒ“2‚©AŠó–]‚É‚æ‚Á‚Ä‚Í
-// ‚»‚êˆÈ~‚Ìƒo[ƒWƒ‡ƒ“‚Ì‚¤‚¿‚Ç‚ê‚©)‚Ì’è‚ß‚éğŒ‚Ì‰º‚ÅÄ”Ğ•z‚Ü‚½‚Í‰ü•Ï‚·‚é‚±‚Æ‚ª
-// ‚Å‚«‚Ü‚·B
+// ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ãƒ•ãƒªãƒ¼ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã§ã™ã€‚ã‚ãªãŸã¯ã“ã‚Œã‚’ã€ãƒ•ãƒªãƒ¼ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢è²¡
+// å›£ã«ã‚ˆã£ã¦ç™ºè¡Œã•ã‚ŒãŸ GNU ä¸€èˆ¬å…¬è¡†åˆ©ç”¨è¨±è«¾å¥‘ç´„æ›¸(ãƒãƒ¼ã‚¸ãƒ§ãƒ³2ã‹ã€å¸Œæœ›ã«ã‚ˆã£ã¦ã¯
+// ãã‚Œä»¥é™ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ã†ã¡ã©ã‚Œã‹)ã®å®šã‚ã‚‹æ¡ä»¶ã®ä¸‹ã§å†é ’å¸ƒã¾ãŸã¯æ”¹å¤‰ã™ã‚‹ã“ã¨ãŒ
+// ã§ãã¾ã™ã€‚
 // 
-// ‚±‚ÌƒvƒƒOƒ‰ƒ€‚Í—L—p‚Å‚ ‚é‚±‚Æ‚ğŠè‚Á‚Ä”Ğ•z‚³‚ê‚Ü‚·‚ªA*‘S‚­‚Ì–³•ÛØ* ‚Å‚·B
-// ¤‹Æ‰Â”\«‚Ì•ÛØ‚â“Á’è‚Ì–Ú“I‚Ö‚Ì“K‡«‚ÍAŒ¾ŠO‚É¦‚³‚ê‚½‚à‚Ì‚àŠÜ‚ß‘S‚­‘¶İ‚µ
-// ‚Ü‚¹‚ñBÚ‚µ‚­‚ÍGNU ˆê”ÊŒöO—˜—p‹–‘øŒ_–ñ‘‚ğ‚²——‚­‚¾‚³‚¢B
+// ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯æœ‰ç”¨ã§ã‚ã‚‹ã“ã¨ã‚’é¡˜ã£ã¦é ’å¸ƒã•ã‚Œã¾ã™ãŒã€*å…¨ãã®ç„¡ä¿è¨¼* ã§ã™ã€‚
+// å•†æ¥­å¯èƒ½æ€§ã®ä¿è¨¼ã‚„ç‰¹å®šã®ç›®çš„ã¸ã®é©åˆæ€§ã¯ã€è¨€å¤–ã«ç¤ºã•ã‚ŒãŸã‚‚ã®ã‚‚å«ã‚å…¨ãå­˜åœ¨ã—
+// ã¾ã›ã‚“ã€‚è©³ã—ãã¯GNU ä¸€èˆ¬å…¬è¡†åˆ©ç”¨è¨±è«¾å¥‘ç´„æ›¸ã‚’ã”è¦§ãã ã•ã„ã€‚
 // 
-// ‚ ‚È‚½‚Í‚±‚ÌƒvƒƒOƒ‰ƒ€‚Æ‹¤‚ÉAGNU ˆê”ÊŒöO—˜—p‹–‘øŒ_–ñ‘‚Ì•¡»•¨‚ğˆê•”ó‚¯æ
-// ‚Á‚½‚Í‚¸‚Å‚·B‚à‚µó‚¯æ‚Á‚Ä‚¢‚È‚¯‚ê‚ÎAƒtƒŠ[ƒ\ƒtƒgƒEƒFƒAà’c‚Ü‚Å¿‹‚µ‚Ä‚­
-// ‚¾‚³‚¢(ˆ¶æ‚Í the Free Software Foundation, Inc., 59 Temple Place, Suite 330
-// , Boston, MA 02111-1307 USA)B
+// ã‚ãªãŸã¯ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¨å…±ã«ã€GNU ä¸€èˆ¬å…¬è¡†åˆ©ç”¨è¨±è«¾å¥‘ç´„æ›¸ã®è¤‡è£½ç‰©ã‚’ä¸€éƒ¨å—ã‘å–
+// ã£ãŸã¯ãšã§ã™ã€‚ã‚‚ã—å—ã‘å–ã£ã¦ã„ãªã‘ã‚Œã°ã€ãƒ•ãƒªãƒ¼ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢è²¡å›£ã¾ã§è«‹æ±‚ã—ã¦ã
+// ã ã•ã„(å®›å…ˆã¯ the Free Software Foundation, Inc., 59 Temple Place, Suite 330
+// , Boston, MA 02111-1307 USA)ã€‚
 //
 // http://www.opensource.jp/gpl/gpl.ja.html
 // ******************************************************
 
 
-// ƒXƒNƒŠƒvƒg‚ğƒŠƒ[ƒh‚·‚é‚½‚ß‚ÌA‚±‚ÌƒXƒNƒŠƒvƒg‚Ì–¼‘O
+// ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’ãƒªãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãŸã‚ã®ã€ã“ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã®åå‰
 $strThisScriptName = htmlspecialchars(basename($_SERVER['PHP_SELF']));
-// ƒx[ƒX ƒfƒBƒŒƒNƒgƒŠiƒT[ƒo‚Ìƒ‹[ƒg‚©‚ç‚ÌƒfƒBƒŒƒNƒgƒŠŠK‘w‚ğ‚·‚×‚Ä‘‚­j
+// ãƒ™ãƒ¼ã‚¹ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªï¼ˆã‚µãƒ¼ãƒã®ãƒ«ãƒ¼ãƒˆã‹ã‚‰ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªéšå±¤ã‚’ã™ã¹ã¦æ›¸ãï¼‰
 $info=posix_getpwuid(posix_geteuid());      // get user HOME dir
 $strBaseDir = $info['dir'].'/www';
-// ‘Š‘Î ƒfƒBƒŒƒNƒgƒŠ
+// ç›¸å¯¾ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 $strRelDir = "";
-// ƒ^[ƒQƒbƒg ƒfƒBƒŒƒNƒgƒŠ
+// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 $strTargetDir = "";
 
-// ‘Š‘Î ƒtƒ@ƒCƒ‹
+// ç›¸å¯¾ ãƒ•ã‚¡ã‚¤ãƒ«
 $strRelFile = "";
-// ƒ^[ƒQƒbƒg ƒtƒ@ƒCƒ‹
+// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ ãƒ•ã‚¡ã‚¤ãƒ«
 $strTargetFile = "";
 
-// HTTPâ‘ÎƒpƒXiÅŒã‚ÌƒXƒ‰ƒbƒVƒ…‚ÍŠÜ‚Ü‚È‚¢j
+// HTTPçµ¶å¯¾ãƒ‘ã‚¹ï¼ˆæœ€å¾Œã®ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã¯å«ã¾ãªã„ï¼‰
 $strAbsolutePath = 'http://www.example.com';
 
-// ‰æ‘œ•w’è
+// ç”»åƒå¹…æŒ‡å®š
 $nFixWidth = 320;
 
-// php.ini‚Ådate.timezone="Asia/Tokyo"‚Æİ’è‚µ‚Ä‚à‚æ‚¢
+// php.iniã§date.timezone="Asia/Tokyo"ã¨è¨­å®šã—ã¦ã‚‚ã‚ˆã„
 //date_default_timezone_set("Asia/Tokyo");
 
-// y”FØ‹¤’ÊŠÖ”z‚ğ—p‚¢‚é
+// ã€èªè¨¼å…±é€šé–¢æ•°ã€‘ã‚’ç”¨ã„ã‚‹
 require_once($info['dir'].'/auth/auth.php');
 
 if(isset($_GET['mode']) && $_GET['mode'] === 'logout'){
-    // ƒƒOƒIƒtˆ—iexit‚·‚éjBsession‚ğ”­s‚·‚é‚Ì‚ÅAPHP‚Ìo—Í‚æ‚è‘O‚É‚±‚Ìˆ—‚ğ’u‚­
+    // ãƒ­ã‚°ã‚ªãƒ•å‡¦ç†ï¼ˆexitã™ã‚‹ï¼‰ã€‚sessionã‚’ç™ºè¡Œã™ã‚‹ã®ã§ã€PHPã®å‡ºåŠ›ã‚ˆã‚Šå‰ã«ã“ã®å‡¦ç†ã‚’ç½®ã
     func_logoff_auth(basename($_SERVER['PHP_SELF']), 0);
 }
 else{
-    // ƒƒOƒCƒ“ˆ—
-    func_check_auth(basename($_SERVER['PHP_SELF']), basename($_SERVER['PHP_SELF']), 0);
+    // ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†
+    func_check_auth(basename($_SERVER['PHP_SELF']), basename($_SERVER['PHP_SELF']), 0, 'UTF-8');
 }
 
 
@@ -69,8 +69,8 @@ else{
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" dir="ltr">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS" />
-<title>Webƒtƒ@ƒCƒ‹ƒuƒ‰ƒEƒU</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+<title>Webãƒ•ã‚¡ã‚¤ãƒ«ãƒ–ãƒ©ã‚¦ã‚¶</title>
 <style type="text/css">
 <!--
 a.file {
@@ -80,14 +80,14 @@ a.file {
 </style>
 </head>
 <body>
-<p>Webƒtƒ@ƒCƒ‹ƒuƒ‰ƒEƒU (version 1.1)</p>
+<p>Webãƒ•ã‚¡ã‚¤ãƒ«ãƒ–ãƒ©ã‚¦ã‚¶ (version 1.1)</p>
 <?php
 
 
-// ‘Š‘ÎƒfƒBƒŒƒNƒgƒŠ‚ÌŒˆ’èi‰½‚àw’è‚ª‚È‚¢‚Æ‚«‚ÍAƒ‹[ƒg / j
+// ç›¸å¯¾ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®æ±ºå®šï¼ˆä½•ã‚‚æŒ‡å®šãŒãªã„ã¨ãã¯ã€ãƒ«ãƒ¼ãƒˆ / ï¼‰
 $strRelDir = "/";
 if($_POST['target_dir'])
-{	// ƒeƒLƒXƒgƒ{ƒbƒNƒX‚æ‚è’¼ÚƒfƒBƒŒƒNƒgƒŠ‚ğw’è‚µ‚½‚Æ‚«
+{	// ãƒ†ã‚­ã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã‚ˆã‚Šç›´æ¥ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’æŒ‡å®šã—ãŸã¨ã
 	if($_POST['target_dir'][0] != '/')
 	{
 		$strRelDir = '/' . $_POST['target_dir'];
@@ -98,7 +98,7 @@ if($_POST['target_dir'])
 	}
 }
 elseif($_GET['target_dir'])
-{	// ƒŠƒ“ƒN‚æ‚èƒfƒBƒŒƒNƒgƒŠ‚ğw’è‚µ‚½‚Æ‚«
+{	// ãƒªãƒ³ã‚¯ã‚ˆã‚Šãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’æŒ‡å®šã—ãŸã¨ã
 	if($_GET['target_dir'][0] != '/')
 	{
 		$strRelDir = '/' . $_GET['target_dir'];
@@ -108,13 +108,13 @@ elseif($_GET['target_dir'])
 		$strRelDir = $_GET['target_dir'];
 	}
 }
-// ––”ö‚É '/' ‚ª‚ ‚éê‡‚Íæ‚èœ‚­
+// æœ«å°¾ã« '/' ãŒã‚ã‚‹å ´åˆã¯å–ã‚Šé™¤ã
 $strRelDir = rtrim($strRelDir, '/');
-// ƒNƒI[ƒg
+// ã‚¯ã‚ªãƒ¼ãƒˆ
 $strRelDir = escape_linux_filename($strRelDir);
 
 if($_GET['target_file'])
-{	// ƒŠƒ“ƒN‚æ‚èƒtƒ@ƒCƒ‹‚ğw’è‚µ‚½‚Æ‚«
+{	// ãƒªãƒ³ã‚¯ã‚ˆã‚Šãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã—ãŸã¨ã
 	if($_GET['target_file'][0] != '/')
 	{
 		$strRelFile = '/' . $_GET['target_file'];
@@ -124,16 +124,16 @@ if($_GET['target_file'])
 		$strRelFile = $_GET['target_file'];
 	}
 }
-// ––”ö‚É '/' ‚ª‚ ‚éê‡‚Íæ‚èœ‚­
+// æœ«å°¾ã« '/' ãŒã‚ã‚‹å ´åˆã¯å–ã‚Šé™¤ã
 $strRelFile = rtrim($strRelFile, '/');
-// ƒNƒI[ƒg
+// ã‚¯ã‚ªãƒ¼ãƒˆ
 $strRelFile = escape_linux_filename($strRelFile);
 
-// â‘ÎƒfƒBƒŒƒNƒgƒŠAƒtƒ@ƒCƒ‹‚ÌŒˆ’è
+// çµ¶å¯¾ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã€ãƒ•ã‚¡ã‚¤ãƒ«ã®æ±ºå®š
 $strTargetDir = $strBaseDir . $strRelDir;
 $strTargetFile = $strBaseDir . $strRelFile;
 
-// ‰æ‘œ‚Ìê‡‚ÌA’·•Ó‚ÌƒsƒNƒZƒ‹”‚ğPOST•Ï”‚æ‚è“¾‚é
+// ç”»åƒã®å ´åˆã®ã€é•·è¾ºã®ãƒ”ã‚¯ã‚»ãƒ«æ•°ã‚’POSTå¤‰æ•°ã‚ˆã‚Šå¾—ã‚‹
 if($_POST['fix_width'])
 {
 	$nFixWidth = intval($_POST['fix_width']);
@@ -143,9 +143,9 @@ if($_POST['fix_width'])
 ?>
 
 <form method="post" action="<?php echo basename($strThisScriptName) ?>">
-<p>•\¦‚µ‚½‚¢ƒfƒBƒŒƒNƒgƒŠ F <input type="text" name="target_dir" value="<?php echo htmlspecialchars($strRelDir) ?>" />
-<input type="submit" value="ƒtƒ@ƒCƒ‹ˆê——‚ğ•\¦‚·‚é" /></p>
-<p>‰æ‘œ‚Ìê‡@’·•Ó‚ÌƒsƒNƒZƒ‹”F<input type="text" size="5" name="fix_width" value="<?php echo $nFixWidth?>" /></p>
+<p>è¡¨ç¤ºã—ãŸã„ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª ï¼š <input type="text" name="target_dir" value="<?php echo htmlspecialchars($strRelDir) ?>" />
+<input type="submit" value="ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹" /></p>
+<p>ç”»åƒã®å ´åˆã€€é•·è¾ºã®ãƒ”ã‚¯ã‚»ãƒ«æ•°ï¼š<input type="text" size="5" name="fix_width" value="<?php echo $nFixWidth?>" /></p>
 
 </form>
 
@@ -157,11 +157,11 @@ if($_POST['fix_width'])
 
 if($strRelFile)
 {
-	print("<p>Œ»İ•\¦’†‚Ìƒtƒ@ƒCƒ‹ F ".htmlspecialchars($strRelFile)."</p>\n");
+	print("<p>ç¾åœ¨è¡¨ç¤ºä¸­ã®ãƒ•ã‚¡ã‚¤ãƒ« ï¼š ".htmlspecialchars($strRelFile)."</p>\n");
 }
 else
 {
-	print("<p>Œ»İ•\¦’†‚ÌƒfƒBƒŒƒNƒgƒŠ F ".htmlspecialchars($strRelDir)."/</p>\n");
+	print("<p>ç¾åœ¨è¡¨ç¤ºä¸­ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª ï¼š ".htmlspecialchars($strRelDir)."/</p>\n");
 }
 
 if(!$strRelFile)
@@ -174,7 +174,7 @@ if(!$strRelFile)
 		{
 			print("<tr><td><a class=\"dir\" href=\"".basename($strThisScriptName)."?target_dir=".htmlspecialchars($strRelDir)."/".htmlspecialchars($strTmp)."\">".htmlspecialchars($strTmp)."</a></td>");
 			print("<td>".attr_to_string(fileperms($strTargetDir."/".$strTmp))."</td>");
-			print("<td>&lt;ƒfƒBƒŒƒNƒgƒŠ&gt;</td>");
+			print("<td>&lt;ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª&gt;</td>");
 			print("<td>");
 			if(time() - filemtime($strTargetDir."/".$strTmp) < 60*60*24*7) print("<span style=\"color:red;\">");
 			elseif(time() - filemtime($strTargetDir."/".$strTmp) > 60*60*24*365) print("<span style=\"color:darkgray;\">");
@@ -203,9 +203,9 @@ if(!$strRelFile)
 else
 {
 	$strMimeType = exec('file -ib '.$strTargetFile);
-	// $strMimeType = mime_content_type($strTargetFile);	// ‚±‚ÌŠÖ”‚ª‘¶İ‚µ‚È‚¢
+	// $strMimeType = mime_content_type($strTargetFile);	// ã“ã®é–¢æ•°ãŒå­˜åœ¨ã—ãªã„
 
-	print("<p>ƒtƒ@ƒCƒ‹‚ÌMIMEƒ^ƒCƒvF".htmlspecialchars($strMimeType)."</p>\n");
+	print("<p>ãƒ•ã‚¡ã‚¤ãƒ«ã®MIMEã‚¿ã‚¤ãƒ—ï¼š".htmlspecialchars($strMimeType)."</p>\n");
 
 	$arrPathElem = explode("/", $strRelFile);
 	$strFileBody = $arrPathElem[count($arrPathElem)-1];
@@ -216,9 +216,9 @@ else
 		$arrImgsize = getimagesize($strTargetFile);
 		if($arrImgsize[0] > 0 && $arrImgsize[1] > 0)
 		{
-			print '<p>‰æ‘œƒTƒCƒY X='.$arrImgsize[0].',Y='.$arrImgsize[1]."</p>\n";
+			print '<p>ç”»åƒã‚µã‚¤ã‚º X='.$arrImgsize[0].',Y='.$arrImgsize[1]."</p>\n";
 
-			// •\¦•‚ÌŒvZ
+			// è¡¨ç¤ºå¹…ã®è¨ˆç®—
 			if($arrImgsize[0] > $arrImgsize[1])
 			{
 				$nWidth = $nFixWidth;
@@ -245,35 +245,35 @@ else
 	}
 	elseif($arrMimeElem[0] == "text")
 	{
-		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'‚ğ•\¦‚·‚é&lt;/a&gt;'."\n"."</textarea></p>\n";
+		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'ã‚’è¡¨ç¤ºã™ã‚‹&lt;/a&gt;'."\n"."</textarea></p>\n";
 
-		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'‚ğ•\¦‚·‚é&lt;/a&gt;'."\n"."</textarea></p>\n";
+		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'ã‚’è¡¨ç¤ºã™ã‚‹&lt;/a&gt;'."\n"."</textarea></p>\n";
 
-		print '<p><a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."‚ğ•\¦‚·‚é</a>\n";
+		print '<p><a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."ã‚’è¡¨ç¤ºã™ã‚‹</a>\n";
 
 	}
 	else
 	{
-		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'‚ğƒ_ƒEƒ“ƒ[ƒh‚·‚é&lt;/a&gt;'."\n"."</textarea></p>\n";
+		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹&lt;/a&gt;'."\n"."</textarea></p>\n";
 
-		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'‚ğƒ_ƒEƒ“ƒ[ƒh‚·‚é&lt;/a&gt;'."\n"."</textarea></p>\n";
+		print '<p><textarea name="full" rows="4" cols="70">&lt;a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'"&gt;'.htmlspecialchars($strFileBody).'ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹&lt;/a&gt;'."\n"."</textarea></p>\n";
 
-		print '<p><a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."‚ğƒ_ƒEƒ“ƒ[ƒh‚·‚é</a>\n";
+		print '<p><a href="'.$strAbsolutePath.htmlspecialchars($strRelFile).'">'.htmlspecialchars($strFileBody)."ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹</a>\n";
 	}
 
 }
 
 ?>
 
-<p><a href="./logoff.php">ƒƒOƒIƒt‚·‚é</a></p>
+<p><a href="./logoff.php">ãƒ­ã‚°ã‚ªãƒ•ã™ã‚‹</a></p>
 </body>
 </html>
 <?php
 
-// Linux‚Åƒtƒ@ƒCƒ‹–¼‚Æ‚µ‚Ä”F‚ß‚ç‚ê‚Ä‚¢‚È‚¢•¶š‚ğÁ‹AƒNƒI[ƒg‚·‚é
+// Linuxã§ãƒ•ã‚¡ã‚¤ãƒ«åã¨ã—ã¦èªã‚ã‚‰ã‚Œã¦ã„ãªã„æ–‡å­—ã‚’æ¶ˆå»ã€ã‚¯ã‚ªãƒ¼ãƒˆã™ã‚‹
 function escape_linux_filename($str)
 {
-	// ˆ—Œã‚Ì•¶š—ñ
+	// å‡¦ç†å¾Œã®æ–‡å­—åˆ—
 	$strReturn = "";
 
 	$strReturn = str_replace(":", "", $str);
@@ -291,57 +291,57 @@ function escape_linux_filename($str)
 	return($strReturn);
 }
 
-// ƒtƒ@ƒCƒ‹‘®«iintj‚ğA•¶š—ñi-rwxrwxrwxjŒ`®‚É•ÏŠ·‚·‚é
+// ãƒ•ã‚¡ã‚¤ãƒ«å±æ€§ï¼ˆintï¼‰ã‚’ã€æ–‡å­—åˆ—ï¼ˆ-rwxrwxrwxï¼‰å½¢å¼ã«å¤‰æ›ã™ã‚‹
 //
-// i‚±‚ÌŠÖ”‚ÍAhttp://jp.php.net/manual/ja/function.fileperms.php ‚ğƒRƒs[‚µ‚½j
-// iCopyright (C) 2001-2009 The PHP Groupj
+// ï¼ˆã“ã®é–¢æ•°ã¯ã€http://jp.php.net/manual/ja/function.fileperms.php ã‚’ã‚³ãƒ”ãƒ¼ã—ãŸï¼‰
+// ï¼ˆCopyright (C) 2001-2009 The PHP Groupï¼‰
 
 function attr_to_string($perms)
 {
-	// ˆ—Œã‚Ì•¶š—ñ
+	// å‡¦ç†å¾Œã®æ–‡å­—åˆ—
 	$strReturn = "";
 
 	if (($perms & 0xC000) == 0xC000) {
-	    // ƒ\ƒPƒbƒg
+	    // ã‚½ã‚±ãƒƒãƒˆ
 	    $strReturn = 's';
 	} elseif (($perms & 0xA000) == 0xA000) {
-	    // ƒVƒ“ƒ{ƒŠƒbƒNƒŠƒ“ƒN
+	    // ã‚·ãƒ³ãƒœãƒªãƒƒã‚¯ãƒªãƒ³ã‚¯
 	    $strReturn = 'l';
 	} elseif (($perms & 0x8000) == 0x8000) {
-	    // ’Êí‚Ìƒtƒ@ƒCƒ‹
+	    // é€šå¸¸ã®ãƒ•ã‚¡ã‚¤ãƒ«
 	    $strReturn = '-';
 	} elseif (($perms & 0x6000) == 0x6000) {
-	    // ƒuƒƒbƒNƒXƒyƒVƒƒƒ‹ƒtƒ@ƒCƒ‹
+	    // ãƒ–ãƒ­ãƒƒã‚¯ã‚¹ãƒšã‚·ãƒ£ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«
 	    $strReturn = 'b';
 	} elseif (($perms & 0x4000) == 0x4000) {
-	    // ƒfƒBƒŒƒNƒgƒŠ
+	    // ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 	    $strReturn = 'd';
 	} elseif (($perms & 0x2000) == 0x2000) {
-	    // ƒLƒƒƒ‰ƒNƒ^ƒXƒyƒVƒƒƒ‹ƒtƒ@ƒCƒ‹
+	    // ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚¹ãƒšã‚·ãƒ£ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«
 	    $strReturn = 'c';
 	} elseif (($perms & 0x1000) == 0x1000) {
-	    // FIFO ƒpƒCƒv
+	    // FIFO ãƒ‘ã‚¤ãƒ—
 	    $strReturn = 'p';
 	} else {
-	    // •s–¾
+	    // ä¸æ˜
 	    $strReturn = 'u';
 	}
 
-	// Š—LÒ
+	// æ‰€æœ‰è€…
 	$strReturn .= (($perms & 0x0100) ? 'r' : '-');
 	$strReturn .= (($perms & 0x0080) ? 'w' : '-');
 	$strReturn .= (($perms & 0x0040) ?
 	            (($perms & 0x0800) ? 's' : 'x' ) :
 	            (($perms & 0x0800) ? 'S' : '-'));
 
-	// ƒOƒ‹[ƒv
+	// ã‚°ãƒ«ãƒ¼ãƒ—
 	$strReturn .= (($perms & 0x0020) ? 'r' : '-');
 	$strReturn .= (($perms & 0x0010) ? 'w' : '-');
 	$strReturn .= (($perms & 0x0008) ?
 	            (($perms & 0x0400) ? 's' : 'x' ) :
 	            (($perms & 0x0400) ? 'S' : '-'));
 
-	// ‘S‘Ì
+	// å…¨ä½“
 	$strReturn .= (($perms & 0x0004) ? 'r' : '-');
 	$strReturn .= (($perms & 0x0002) ? 'w' : '-');
 	$strReturn .= (($perms & 0x0001) ?
