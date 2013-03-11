@@ -1,4 +1,6 @@
 <?php
+
+$str_version = '1.11';    // 画面に表示するバージョン
 // ******************************************************
 // Software name : Web File Browser （Web ファイルブラウザ）
 //
@@ -7,6 +9,7 @@
 //
 // version 1.0 (2010/Feb/21)
 // version 1.1 (2010/Feb/23)
+// version 1.11 (2013/Mar/11)
 //
 // GNU GPL Free Software
 //
@@ -32,7 +35,13 @@
 $strThisScriptName = htmlspecialchars(basename($_SERVER['PHP_SELF']));
 // ベース ディレクトリ（サーバのルートからのディレクトリ階層をすべて書く）
 $info=posix_getpwuid(posix_geteuid());      // get user HOME dir
-$strBaseDir = $info['dir'].'/www';
+
+// 設定ファイルより、ユーザ環境ごとのディレクトリ等の設定値を読み込む
+require_once('./config.php');
+global $strBaseDir;
+global $strAbsolutePath;
+global $nFixWidth;
+
 // 相対 ディレクトリ
 $strRelDir = "";
 // ターゲット ディレクトリ
@@ -42,12 +51,6 @@ $strTargetDir = "";
 $strRelFile = "";
 // ターゲット ファイル
 $strTargetFile = "";
-
-// HTTP絶対パス（最後のスラッシュは含まない）
-$strAbsolutePath = 'http://www.example.com';
-
-// 画像幅指定
-$nFixWidth = 320;
 
 // php.iniでdate.timezone="Asia/Tokyo"と設定してもよい
 //date_default_timezone_set("Asia/Tokyo");
@@ -80,9 +83,9 @@ a.file {
 </style>
 </head>
 <body>
-<p>Webファイルブラウザ (version 1.1)</p>
 <?php
 
+printf("<p>Webファイルブラウザ Version %s</p>\n", $str_version);
 
 // 相対ディレクトリの決定（何も指定がないときは、ルート / ）
 $strRelDir = "/";
@@ -263,12 +266,9 @@ else
 
 }
 
-?>
-
-<p><a href="./logoff.php">ログオフする</a></p>
-</body>
-</html>
-<?php
+print("<p><a href=\"".$strThisScriptName."?mode=logout\">ログオフする</a></p>\n".
+        "</body>\n".
+        "</html>\n");
 
 // Linuxでファイル名として認められていない文字を消去、クオートする
 function escape_linux_filename($str)
