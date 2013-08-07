@@ -1,6 +1,6 @@
 <?php
 
-$str_version = '0.2';    // 画面に表示するバージョン
+$str_version = '0.3';    // 画面に表示するバージョン
 // ******************************************************
 // Software name : Sendmail-SMTP
 //
@@ -9,6 +9,7 @@ $str_version = '0.2';    // 画面に表示するバージョン
 //
 // version 0.1 (2009/04/29)
 // version 0.2 (2012/03/07)
+// version 0.3 (2013/08/07)
 //
 // GNU GPL Free Software
 //
@@ -151,7 +152,24 @@ else
         print("<p>本文の78桁での自動改行 : ON</p>\n");
     }
 
-    sendmail_sendmsg(intval($_POST['account_no']), stripslashes($_POST['subject']), $_POST['addr_to'],
+    $subject = stripslashes($_POST['subject']);
+
+    // Subject（タイトル）文字列の「特殊空白文字」を半角空白1文字に置換する
+    $str_match = "/[".pack('CCC', 0xe2, 0x80, 0x80).pack('CCC', 0xe2, 0x80, 0x81).
+                pack('CCC', 0xe2, 0x80, 0x82).pack('CCC', 0xe2, 0x80, 0x83).
+                pack('CCC', 0xe2, 0x80, 0x84).pack('CCC', 0xe2, 0x80, 0x85).
+                pack('CCC', 0xe2, 0x80, 0x86).pack('CCC', 0xe2, 0x80, 0x87).
+                pack('CCC', 0xe2, 0x80, 0x88).pack('CCC', 0xe2, 0x80, 0x89)."]+/u";
+    $subject = preg_replace($str_match, " ", $subject);
+
+    // 本文文字列の「特殊空白文字」を半角空白1文字に置換する
+    $msg = preg_replace($str_match, " ", $msg);
+
+    // Subject（タイトル）文字列の先頭・末尾の半角・全角スペースを取り除く
+    $subject = preg_replace("/^[\s]+/u", "", $subject);
+    $subject = preg_replace("/[\s]+$/u", "", $subject);
+
+    sendmail_sendmsg(intval($_POST['account_no']), $subject, $_POST['addr_to'],
             stripslashes($_POST['fromname']), $msg, $debug_flag);
 
 }
@@ -172,6 +190,7 @@ function sendmail_sendmsg($account_no, $subject, $rcpt, $fromname, $msg, $debug_
 {
     // account list array, from config.php
     global $arrAccountsSmtp;
+    global $strNewsSendRcpt;
     // $account_noの範囲チェック
     if($account_no <= 0 || $account_no > count($arrAccountsSmtp)) {
         printf("<p>アカウント指定Noが範囲外です<br/>account=%d</p>\n", $account_no);
