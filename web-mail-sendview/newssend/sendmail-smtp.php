@@ -168,7 +168,7 @@ else
     $subject = preg_replace("/^[\s]+/u", "", $subject);
     $subject = preg_replace("/[\s]+$/u", "", $subject);
 
-    sendmail_sendmsg(intval($_POST['account_no']), stripslashes($_POST['subject']), $strNewsSendRcpt,
+    sendmail_sendmsg(intval($_POST['account_no']), $subject, $strNewsSendRcpt,
             stripslashes($_POST['fromname']), $msg, $debug_flag);
 
 }
