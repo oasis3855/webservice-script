@@ -11,6 +11,7 @@
 # version 0.1 (2011/May/05)
 # version 0.1.1 (2012/Mar/26) : fancybox
 # version 0.1.2 (2012/Jun/18) : bugfix
+# version 0.1.3 (2013/11/10) : ディレクトリ選択を記憶, INIファイル
 #
 # GNU GPL Free Software
 #
@@ -48,6 +49,7 @@ use Image::Size;
 use Encode::Guess qw/euc-jp shiftjis iso-2022-jp/;	# 必要ないエンコードは削除すること
 use HTML::Entities;
 use Stat::lsMode qw/format_mode/;	# ファイル属性を -rwxr-xr-x のように整形する
+use Config::Tiny;	# INIファイル読み書き
 
 # 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
 require ((getpwuid($<))[7]).'/auth/auth.pl';    # 認証システム
@@ -68,8 +70,11 @@ if($flag_charcode eq 'shiftjis'){
 
 my $str_fpath_config = './config/init.pl';	# 設定ファイル
 my $str_fpath_log = './log/log.txt';		# ログファイル
+my $str_fpath_varsave = './config/varsave.ini';		# ユーザ選択値一時保存ファイル
 
 my $str_this_script = basename($0);		# このスクリプト自身のファイル名
+
+my $n_dir_select = 0;	# アップロードディレクトリのデフォルト選択値
 
 main();
 exit;
@@ -82,6 +87,8 @@ sub main{
 
 	# 初期設定ファイルの読み込み
 	require $str_fpath_config;
+	# INIファイル読み込み
+	sub_read_varsave();
 
 	# 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
 	# 認証状態のチェック（認証されていない場合は、認証画面を表示する）
@@ -176,7 +183,7 @@ print << '_EOT_FOOTER';
 <p>&nbsp;</p> 
 <div class="clear"></div> 
 <div id="footer"> 
-<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.2 &nbsp;&nbsp; GNU GPL free software</p> 
+<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.3 &nbsp;&nbsp; GNU GPL free software</p> 
 </div>	<!-- id="footer" --> 
 _EOT_FOOTER
 
@@ -220,6 +227,36 @@ sub sub_check_files{
 	unless( -w $str_fpath_log ){
 		sub_error_exit("Error : ログファイル ".$str_fpath_log . " に書き込めません", $q_ref);
 	}
+}
+
+# ユーザ選択値を読み込む
+sub sub_read_varsave {
+	our @arr_updirs;
+
+	# INIファイルの読み込み
+	my $config = Config::Tiny->new();
+	$config = Config::Tiny->read($str_fpath_varsave);
+	if(!defined($config)){ $n_dir_select = 0; return; }		# INIファイル読み込み失敗
+
+	# INIファイルの [arr_updirs] セクション内の select の値を得る
+	my $str_temp = $config->{arr_updirs}->{select};
+
+	# 値のチェック
+	if(!defined($str_temp)){ $n_dir_select = 0; return; }	# 値が見つからない場合
+	if($str_temp =~ /[^0-9]/){ $n_dir_select = 0; return; }	# 数字以外が含まれていた場合
+	if($#arr_updirs < $str_temp){ $n_dir_select = 0; return; }
+	$n_dir_select = $str_temp;
+}
+
+# ユーザ選択値を書き込む
+sub sub_write_varsave {
+	$n_dir_select = shift;
+
+	my $config = Config::Tiny->new();
+	$config->{arr_updirs}->{select} = $n_dir_select;
+	# INIファイルに書き込み
+	$config->write($str_fpath_varsave);
+
 }
 
 
@@ -282,7 +319,7 @@ sub sub_disp_home{
 		"<p>アップロード先ディレクトリを選択します<br />\n");
 
 	for(my $i=0; $i<=$#arr_updirs; $i++){
-		print("&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"dir\" value=\"".$i."\" ".($i==0 ? "checked=\"checked\"" : '').
+		print("&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"radio\" name=\"dir\" value=\"".$i."\" ".($i==$n_dir_select ? "checked=\"checked\"" : '').
 			" />".sub_conv_to_flagged_utf8($arr_updirs[$i],'utf8').($i==$#arr_updirs ? '</p>' : '<br />')."\n");
 	}
 	
@@ -334,6 +371,9 @@ sub sub_upload{
 	if($str_filename =~ m#[\x00-\x1f]|/|<|>|&|\*|\"|\'#){
 		sub_error_exit("Error : ファイル名に利用できない文字が含まれています");
 	}
+
+	# INIファイルにディレクトリ選択を保存
+	sub_write_varsave($$q_ref->param('dir')+0);
 
 	# 保存先ファイルの上書きチェック
 	my $str_save_filepath = $str_basedir . sub_conv_to_flagged_utf8($arr_updirs[$$q_ref->param('dir')+0],'utf8') . '/' . $str_filename;
