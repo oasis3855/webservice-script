@@ -54,11 +54,11 @@ else{
 	func_check_auth(basename($_SERVER['PHP_SELF']), basename($_SERVER['PHP_SELF']), 0, 'UTF-8');
 }
 
-main_func();
+main_func($strThisScriptName);
 
 
 // メイン処理関数
-function main_func()
+function main_func($strThisScriptName)
 {
 	// HTMLヘッダと画面タイトル部分を出力
 	print_header();
