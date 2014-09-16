@@ -3,14 +3,19 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Language" content="ja" />
+	<!-- disable viewport for mobile device -->
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=2.0,minimum-scale=1.0,user-scalable=1" />
+	<link rel="stylesheet" href="rss_receive.css" type="text/css" />
+
 	<title> </title>
 </head>
-<body style="font-size:10pt;  background-color:#e6e6e6;">
+<body>
 
 <?php
 
 //************************************************
 // Software name : rss_receive.php		version 1.01 (2009/11/19)
+//                                      version 1.1  (2014/09/15)
 // Copyright (C) 2009 INOUE Hirokazu
 // All Rights Reserved
 //
@@ -62,7 +67,7 @@ mb_internal_encoding('SJIS');
 mb_http_output('UTF-8');
 
 // use user's home directory PEAR
-ini_set('include_path', '/home/userhome/pear/pear/php' . PATH_SEPARATOR . ini_get('include_path'));
+ini_set('include_path', '/home/*****USERHOME*****/pear/pear/php' . PATH_SEPARATOR . ini_get('include_path'));
 
 // PearのNet_IMAPを利用する
 require_once('XML/Feed/Parser.php');
@@ -140,7 +145,7 @@ function display_rssuri_list($strReloadPage)
 	$handle = @fopen("./rss_receive.ini", "r");
 	if ($handle)
 	{
-		print("<ul type=\"circle\" style=\"color:#808080;\">\n");
+		print("<ul>\n");
 		while (!feof($handle))
 		{
 			$nLine++;
@@ -155,7 +160,7 @@ function display_rssuri_list($strReloadPage)
 			if(count($arrUri)<=1 || empty($arrUri[1])) $strTitle = $arrUri[0];
 			else $strTitle = $arrUri[1];
 			
-			printf("<li><a href=%s?rssuri=%s>%s</a></li>\n", $strReloadPage,
+			printf("<li class=\"mainmenu\"><a href=\"%s?rssuri=%s\">%s</a></li>\n", $strReloadPage,
 					$arrUri[0], $strTitle);
 		}
 		print("</ul>\n");
@@ -219,13 +224,12 @@ function read_rss($uri)
 
 	// XML_RSSクラスの初期化と、受信
 	$rss =& new XML_Feed_Parser($strRssSource);
-
-	printf("<div style=\"background-color:#d5d9e6; padding-top:3px;\"><p><span style=\"font-size:12pt;\">%s</span> (%s) <a target=\"_blank\" href=\"%s\">%s</a></p></div>\n", trim($rss->title),
+	// RSSサイトのタイトル行を表示
+	printf("<h2><span class=\"head\">%s</span> (%s) <a target=\"_blank\" href=\"%s\">%s</a></h2>\n", trim($rss->title),
 			$rss->__get('version'), $uri, $uri);
 
 	$i = 0;
-	print("<table>\n".
-		"\t<tr><td width=\"120px\"></td><td></td></tr>\n");
+	print("<ul>\n");
 	foreach ($rss as $item) {    // データの取り出し
 		$strTitle = $item->title;
 		$strLink = $item->link;
@@ -241,22 +245,33 @@ function read_rss($uri)
 		if($strDate!=null && time()-$strDate>$nSwPrevDays*24*3600+1)
 			continue;	// 指定期間より古い
 
-		printf("\t<tr><td>%04d/%02d/%02d %02d:%02d</td><td><a target=\"_blank\" style=\"font-size:12pt;\" href=\"%s\">%s</a></td></tr>\n",
+		// RSS項目を表示（日時と、記事へのリンク）
+		printf("  <li><span class=\"date\">%04d/%02d/%02d %02d:%02d</span> <a target=\"_blank\" href=\"%s\">%s</a></li>\n",
 			$arrDate['year'], $arrDate['mon'], $arrDate['mday'], $arrDate['hours'], $arrDate['minutes'],
 			htmlspecialchars($strLink), htmlspecialchars($strTitle));
 		
+		// RSS要約を表示
 		if($nSwDescription == 1)
 		{
-			if(!empty($strDescription))
-				printf("<tr><td></td><td>%s</td></tr>\n", htmlspecialchars(strip_tags($strDescription)));
-			else
-				printf("<tr><td></td><td>%s</td></tr>\n", htmlspecialchars(strip_tags($strContent)));
+			$strTemp = "";
+			// RSSサイトにより$strDescriptionまたは$strContentに要約が格納されている差異を吸収する
+			if(!empty($strDescription)) $strTemp = $strDescription;
+			else $strTemp = $strContent;
+			// 長い文章の場合、途中できる処理をしてから画面表示する
+			$strTemp = strip_tags($strTemp);
+			if(mb_strlen($strTemp, "utf-8") > 400)
+			{
+				$strTemp = mb_substr($strTemp, 0, 400, "utf-8");
+				printf("  <li class=\"contents\">%s <span style=\"color:red;\">...</span></li>\n", htmlspecialchars($strTemp));
+			}
+			else printf("  <li class=\"contents\">%s</li>\n", htmlspecialchars($strTemp));
+
 		}
 
 		$i++;
 		if($i>=$nSwTopicCount) break;	// 指定されたトピック数のみ表示
 	}
-	print("</table>\n");
+	print("</ul>\n");
 	
 	return $strReturn;
 }
