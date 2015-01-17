@@ -12,6 +12,7 @@
 # version 0.1.1 (2012/Mar/26) : fancybox
 # version 0.1.2 (2012/Jun/18) : bugfix
 # version 0.1.3 (2013/11/10) : ディレクトリ選択を記憶, INIファイル
+# version 0.1.4 (2015/01/17) : 出力HTMLのa target属性をONにしないのをデフォルトに変更
 #
 # GNU GPL Free Software
 #
@@ -183,7 +184,7 @@ print << '_EOT_FOOTER';
 <p>&nbsp;</p> 
 <div class="clear"></div> 
 <div id="footer"> 
-<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.3 &nbsp;&nbsp; GNU GPL free software</p> 
+<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.4 &nbsp;&nbsp; GNU GPL free software</p> 
 </div>	<!-- id="footer" --> 
 _EOT_FOOTER
 
@@ -334,7 +335,7 @@ sub sub_disp_home{
 		"&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"off\" />OFF（実寸）</td></tr>\n".
 		"<tr><td>alt属性値</td><td><input type=\"text\" name=\"alt\" value=\"\" size=\"30\" />&nbsp;<input type=\"checkbox\" name=\"alt_fname\" value=\"enable\" checked=\"checked\" />空欄の時はファイル名を利用</td></tr>\n".
 		"<tr><td>title属性値</td><td><input type=\"text\" name=\"title\" value=\"\" size=\"30\" /> (空欄の時は属性削除) </td></tr>\n".
-		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く&nbsp;&nbsp;<input type=\"checkbox\" name=\"fancybox\" value=\"on\" checked=\"checked\" />fancybox対応（&lt;a rel=... title=...&gt;）</td></tr>\n".
+		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" />ファイル（画像）を新しいウインドウで開く&nbsp;&nbsp;<input type=\"checkbox\" name=\"fancybox\" value=\"on\" checked=\"checked\" />fancybox対応（&lt;a rel=... title=...&gt;）</td></tr>\n".
 		#####
 		"</table>\n".
 		"</div>\n".
@@ -527,7 +528,7 @@ sub sub_disp_file_code {
 		"&nbsp;&nbsp;<input type=\"radio\" name=\"size_base\" value=\"off\" />OFF（実寸）</td></tr>\n".
 		"<tr><td>alt属性値</td><td><input type=\"text\" name=\"alt\" value=\"".$alt."\" size=\"30\" />&nbsp;<input type=\"checkbox\" name=\"alt_fname\" value=\"enable\" checked=\"checked\" />空欄の時はファイル名を利用</td></tr>\n".
 		"<tr><td>title属性値</td><td><input type=\"text\" name=\"title\" value=\"".(defined($title) ? $title : '')."\" size=\"30\" /> (空欄の時は属性削除) </td></tr>\n".
-		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" checked=\"checked\" />ファイル（画像）を新しいウインドウで開く&nbsp;&nbsp;<input type=\"checkbox\" name=\"fancybox\" value=\"on\" checked=\"checked\" />fancybox対応（&lt;a rel=... title=...&gt;）</td></tr>\n".
+		"<tr><td>その他</td><td><input type=\"checkbox\" name=\"target\" value=\"blank\" />ファイル（画像）を新しいウインドウで開く&nbsp;&nbsp;<input type=\"checkbox\" name=\"fancybox\" value=\"on\" checked=\"checked\" />fancybox対応（&lt;a rel=... title=...&gt;）</td></tr>\n".
 		#####
 		"</table>\n".
 		"<input type=\"submit\" value=\"表示条件を変更して再表示する\" />\n".
