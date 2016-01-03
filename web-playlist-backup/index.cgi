@@ -9,6 +9,7 @@
 #
 # csv2html-thumb.pl
 # version 0.1 (2011/April/06)
+# version 0.2 (2016/January/03)  HTML5 audio再生対応
 #
 # GNU GPL Free Software
 #
@@ -37,6 +38,7 @@ use utf8;
 use lib ((getpwuid($<))[7]).'/local/cpan/lib/perl5';    # ユーザ環境にCPANライブラリを格納している場合
 use lib ((getpwuid($<))[7]).'/local/lib/perl5';         # ユーザ環境にCPANライブラリを格納している場合
 use lib ((getpwuid($<))[7]).'/local/lib/perl5/site_perl/5.8.9/mach';         # ユーザ環境にCPANライブラリを格納している場合
+use lib ((getpwuid($<))[7]).'/local/lib/perl5/amd64-freebsd';
 
 use CGI;
 use File::Basename;
@@ -148,13 +150,20 @@ sub sub_print_start_html{
 
 	my $q_ref = shift;	# CGIオブジェクト
 
-	print($$q_ref->header(-type=>'text/html', -charset=>'utf-8'));
-	print($$q_ref->start_html(-title=>"Playlist(PLS) Backup Strage",
-			-dtd=>['-//W3C//DTD XHTML 1.0 Transitional//EN','http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'],
-			-lang=>'ja-JP',
-			-style=>{'src'=>'style.css'}));
+# HTMLヘッダ
+print << '_EOT_HEAD';
+Content-type: text/html; charset=utf-8
 
-# ヘッダの表示
+<!doctype html>
+<html lang="ja">
+ <head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="style.css" type="text/css" />
+  <title>Playlist(PLS) Backup Strage</title>
+ </head>
+<body>
+_EOT_HEAD
+
 print << '_EOT';
 <div style="height:100px; width:100%; padding:0px; margin:0px;"> 
 <p><span style="margin:0px 20px; font-size:30px; font-weight:lighter;">Web-Playlist backup</span><span style="margin:0px 0px; font-size:25px; font-weight:lighter; color:lightgray;">PLS file backup system</span></p> 
@@ -196,7 +205,7 @@ print << '_EOT_FOOTER';
 <p>&nbsp;</p> 
 <div class="clear"></div> 
 <div id="footer"> 
-<p><a href="http://oasis.halfmoon.jp/">Web-Playlist backup</a> version 0.1 &nbsp;&nbsp; GNU GPL free software</p> 
+<p><a href="http://oasis.halfmoon.jp/">Web-Playlist backup</a> version 0.2 &nbsp;&nbsp; GNU GPL free software</p> 
 </div>	<!-- id="footer" --> 
 _EOT_FOOTER
 
@@ -834,7 +843,9 @@ sub sub_edit_db{
 			print("<p>idxに一致するデータが存在しません</p>\n");
 		}
 		else{
-			print("<form method=\"post\" action=\"".$str_this_script."?mode=edit&amp;idx=".$arr[0]."\" name=\"form1\"></p>\n".
+			print("<audio src=\"".encode_entities(sub_conv_to_flagged_utf8($arr[2], 'utf8'))."\" controls><p>このブラウザではHTML5のオーディオ再生は不可</p></audio>\n");
+
+			print("<form method=\"post\" action=\"".$str_this_script."?mode=edit&amp;idx=".$arr[0]."\" name=\"form1\">\n".
 					"<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n".
 					" <tr><td>idx</td><td><input name=\"idx\" type=\"text\" size=\"10\" value=\"".$arr[0]."\" readonly=\"readonly\" />（変更不可）</td></tr>\n".
 					" <tr><td>title</td><td><input name=\"title\" type=\"text\" size=\"50\" value=\"".encode_entities(sub_conv_to_flagged_utf8($arr[1], 'utf8'))."\" /></td></tr>\n".
