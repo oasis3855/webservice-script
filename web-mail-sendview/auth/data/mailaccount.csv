@@ -1,0 +1,5 @@
+# nickname,mail_server,user_name,password,service,port-imap,port-pop3,port-smtp
+my-server,example.com,user@example.com,mypassword,imap/pop3/smtp,993,110,587
+gmail_imap,imap.gmail.com,user@gmail.com,mypassword,imap,993,0,0
+gmail_smtp,smtp.gmail.com,user@gmail.com,mypassword,smtp,0,0,587
+
