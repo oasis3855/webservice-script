@@ -1,0 +1,59 @@
+
+body {
+    font-size:10pt;
+    background-color:#e6e6e6;
+}
+
+h2 {
+    font-size:0.8em;
+    font-style:normal;
+    font-weight:normal;
+    background-color:#d5d9e6;
+    margin-top: 0;
+    padding-top:10px;
+    margin-bottom: 5px;
+    padding-bottom: 0;
+}
+
+h2 span.head {
+    font-size:1.5em;
+}
+
+ul {
+    margin-left: 0;
+    padding-left: 0;
+    margin-top: 0;
+    padding-top: 0;
+    margin-bottom: 5px;
+    padding-bottom: 0;
+}
+
+li {
+    list-style: none;
+}
+
+li.mainmenu {
+    list-style-type: circle;
+    margin-left: 2em;
+    font-size:0.8em;
+}
+
+li span.date {
+}
+
+li a {
+    font-size:1.2em;
+}
+
+/* 低解像度 */
+@media screen and (max-width: 639px){
+
+    li.contents {
+        margin-left: 2em !important;
+    }
+
+}
+
+li.contents {
+    margin-left: 8em;
+}
