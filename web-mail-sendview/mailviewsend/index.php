@@ -36,7 +36,7 @@ else{
 <body style="font-size:11pt; background-color:#e6e6e6">
 <p>メール機能選択メニュー</p>
 
-<p><a href="view-imapmail.php">メール閲覧（imap版）システムを使う</a></p>
+<p><a href="view-imapmail.php">メール閲覧（imap版）システムを使う</a>&nbsp;&nbsp;&nbsp;<a href="view-imapmail-debug.php">imap debug messageを表示する(loginのみ)</a></p>
 <p><a href="view-pop3mail.php">メール閲覧（pop3版）システムを使う</a></p>
 <p><a href="sendmail-mime.php">送信(mime）</a>&nbsp;/&nbsp;<a href="sendmail-smtp.php">送信(smtp）</a></p>
 <p><a href="<?php echo basename($_SERVER['PHP_SELF']); ?>?mode=logout">ログオフ</a></p>

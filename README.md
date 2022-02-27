@@ -29,7 +29,7 @@ Webサーバ内のディレクトリやファイルの一覧を表示したり�
 
 PHPスクリプトでメールを送受信するサンプルWebサービス。imapまたはsmtpでのメール送信、imapまたはpop3でのメール受信が組み込まれている。
 
-[配布ディレクトリ web-mail-sendview](web-mail-sendview/README.md) (2013/12/05)
+[配布ディレクトリ web-mail-sendview](web-mail-sendview/README.md) (2021/02/27)
 
 <br />
 <br />
@@ -38,7 +38,7 @@ PHPスクリプトでメールを送受信するサンプルWebサービス。im
 
 ストリーミング ミュージック再生アプリからバックアップ取得したプレイリスト（PLS）ファイルを、web上で管理するためのスクリプト。web上でストリーミングサイトを新規追加・編集・再生することも出来る。
 
-[配布ディレクトリ web-playlist-backup](web-playlist-backup/README.md) (2013/12/05)
+[配布ディレクトリ web-playlist-backup](web-playlist-backup/README.md) (2016/01/03)
 
 <br />
 <br />
