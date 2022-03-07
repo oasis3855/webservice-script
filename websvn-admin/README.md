@@ -1,6 +1,6 @@
 ## WebSVN Administrator - Subversionリポジトリ管理（Linux, BSD Web Service）<br />Subversion repository administration script<!-- omit in toc -->
 
-[Home](https://oasis3855.github.io/webpage/) > [Software](https://oasis3855.github.io/webpage/software/index.html) > [Software Download](https://oasis3855.github.io/webpage/software/software-download.html) > [webservice-scripts](../) > ***websvn-admin*** (this page)
+[Home](https://oasis3855.github.io/webpage/) > [Software](https://oasis3855.github.io/webpage/software/index.html) > [Software Download](https://oasis3855.github.io/webpage/software/software-download.html) > [webservice-scripts](../README.md) > ***websvn-admin*** (this page)
 
 <br />
 <br />

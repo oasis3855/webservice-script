@@ -65,7 +65,7 @@ PHPスクリプトでメールを送受信するサンプルWebサービス。im
 
 Webサーバ上で稼動する、ローカル（Webサーバ内の）Subversionのリポジトリ管理。sshで接続してsvnadminコマンドを用いることなく、Web経由でリポジトリの作成や削除などの操作が可能です。
 
-[配布ディレクトリ websvn-admin](websvn-admin/README.md) (2011/12/08)
+[配布ディレクトリ websvn-admin](websvn-admin/README.md) (2011/01/22)
 
 <br />
 <br />

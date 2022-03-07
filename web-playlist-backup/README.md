@@ -1,6 +1,6 @@
 ## mp3ストリーミングのプレイリスト(PLS)管理Perlスクリプト（Linux, BSD Web Service）<br />mp3 streaming station playlist (pls) backup web service<!-- omit in toc -->
 
-[Home](https://oasis3855.github.io/webpage/) > [Software](https://oasis3855.github.io/webpage/software/index.html) > [Software Download](https://oasis3855.github.io/webpage/software/software-download.html) > [webservice-scripts](../) > ***web-playlist-backup*** (this page)
+[Home](https://oasis3855.github.io/webpage/) > [Software](https://oasis3855.github.io/webpage/software/index.html) > [Software Download](https://oasis3855.github.io/webpage/software/software-download.html) > [webservice-scripts](../README.md) > ***web-playlist-backup*** (this page)
 
 <br />
 <br />

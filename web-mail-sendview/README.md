@@ -1,6 +1,6 @@
 ## シンプルなメール送受信PHPスクリプト（Linux, BSD Web Service）<br />Simple mail send/receive PHP script<!-- omit in toc -->
 
-[Home](https://oasis3855.github.io/webpage/) > [Software](https://oasis3855.github.io/webpage/software/index.html) > [Software Download](https://oasis3855.github.io/webpage/software/software-download.html) > [webservice-scripts](../) > ***web-mail-sendview*** (this page)
+[Home](https://oasis3855.github.io/webpage/) > [Software](https://oasis3855.github.io/webpage/software/index.html) > [Software Download](https://oasis3855.github.io/webpage/software/software-download.html) > [webservice-scripts](../README.md) > ***web-mail-sendview*** (this page)
 
 <br />
 <br />
