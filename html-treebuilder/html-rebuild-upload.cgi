@@ -8,6 +8,7 @@
 #
 # version 1.0 (2010/03/13)
 # version 1.1 (2010/03/19)
+# version 1.2 (2022/03/24)
 #
 # GNU GPL Free Software
 # http://www.opensource.jp/gpl/gpl.ja.html
@@ -28,7 +29,9 @@ use HTML::TreeBuilder;
 use HTML::Entities;
 use Encode;
 use Encode::Guess;
-use HTML::Tagset ();
+use HTML::Tagset;
+use Image::Size;
+use LWP::UserAgent;
 
 # 自身のスクリプト名
 my $strThisScript = basename( $0, '' );
@@ -39,6 +42,8 @@ my $boolRewriteAttrSmall = 0;
 my $boolImgAlt           = 0;
 my $boolIndentTab        = 0;
 my $boolDownload         = 0;
+my $boolSetImgsize       = 0;
+my $strRefImgHttp        = "";    # NULL文字列の場合は画像サイズを消去
 
 # デバッグ用
 my $boolDebug = 0;
@@ -76,12 +81,14 @@ my @arrAttr = (
 my $q = CGI->new;
 
 # 機能スイッチの設定
-if ( $q->param('chk_bool') )      { $boolWriteBooleanAttr = 1; }
-if ( $q->param('chk_attrsmall') ) { $boolRewriteAttrSmall = 1; }
-if ( $q->param('chk_imgalt') )    { $boolImgAlt           = 1; }
-if ( $q->param('chk_tab') )       { $boolIndentTab        = 1; }
-if ( $q->param('chk_debug') )     { $boolDebug            = 1; }
-if ( $q->param('chk_download') )  { $boolDownload         = 1; }
+if ( $q->param('chk_bool') )       { $boolWriteBooleanAttr = 1; }
+if ( $q->param('chk_attrsmall') )  { $boolRewriteAttrSmall = 1; }
+if ( $q->param('chk_imgalt') )     { $boolImgAlt           = 1; }
+if ( $q->param('chk_tab') )        { $boolIndentTab        = 1; }
+if ( $q->param('chk_debug') )      { $boolDebug            = 1; }
+if ( $q->param('chk_download') )   { $boolDownload         = 1; }
+if ( $q->param('chk_setimgsize') ) { $boolSetImgsize       = 1; }
+if ( $q->param('refimghttp') )     { $strRefImgHttp        = $q->param('refimghttp'); }
 sub_print_html_header();
 
 # ファイルアップロードされたときの処理
@@ -130,14 +137,15 @@ sub sub_print_html_header {
         print "Content-type: text/html\n\n";
         print
 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-          . "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+          . "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"ja\" lang=\"ja\">\n"
           . "<head>\n"
-          . "\t<meta content=\"text/html; charset=UTF-8\" />\n"
-          . "\t<title>HTML::TreeBuilderによるHTML整形</title>\n"
-          . "\t<style type=\"text/css\">\n"
-          . "\tpre { border:1px solid gray; background-color: #c0c0c0; width: 795px; overflow-x: scroll; font-size: 10pt;}\n"
-          . "\tbody {position: relative; width: 800px; margin: 0 auto; font-size: 11pt;};\n"
-          . "\t</style>\n"
+          . "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
+          . "    <meta http-equiv=\"Content-Language\" content=\"ja\" />\n"
+          . "    <title>HTML::TreeBuilderによるHTML整形</title>\n"
+          . "    <style type=\"text/css\">\n"
+          . "    pre { border:1px solid gray; background-color: #c0c0c0; width: 795px; overflow-x: scroll; font-size: 10pt;}\n"
+          . "    body {position: relative; width: 800px; margin: 0 auto; font-size: 11pt;};\n"
+          . "    </style>\n"
           . "</head>\n"
           . "<body>\n"
           . "<p>HTML::TreeBuilderによるHTML整形</p>\n";
@@ -163,9 +171,11 @@ sub sub_print_inputform {
       . "<input type=\"checkbox\" name=\"chk_imgalt\" checked=\"checked\" />imgにalt属性無い場合は補完(XHTML)<br />\n"
       . "<input type=\"checkbox\" name=\"chk_tab\" checked=\"checked\" />インデントをTABで出力, \n"
       . "<input type=\"checkbox\" name=\"chk_debug\" />デバッグ表示, \n"
-      . "<input type=\"checkbox\" name=\"chk_download\" />結果をファイルとしてダウンロード\n"
+      . "<input type=\"checkbox\" name=\"chk_download\" />結果をファイルとしてダウンロード<br />\n"
+      . "<input type=\"checkbox\" name=\"chk_setimgsize\" />画像サイズ再設定 → ベースURL : \n"
+      . "<input type=\"text\" name=\"refimghttp\" size=\"50\" value=\"http://www.example.com/pics/\" />\n"
       . "</form>\n"
-      . "<p>読み込むファイルはあらかじめUTF-8に変換しておくと、文字化けを防げます<p>\n";
+      . "<p>読み込むファイルはあらかじめUTF-8に変換しておくと、文字化けを防げます</p>\n";
     return;
 }
 
@@ -222,6 +232,32 @@ sub sub_print_html {
         }
     }
 
+    # imgタグ内のheight, widthサイズ設定の編集
+    if ($boolSetImgsize) {
+        foreach my $node ( $tree->look_down( '_tag' => 'img' ) ) {
+            if ( defined( $node->attr('width') ) || defined( $node->attr('height') ) ) {
+                my $ua     = LWP::UserAgent->new;
+                my $strUrl = $strRefImgHttp . $node->attr('src');
+                my $req    = HTTP::Request->new( GET => $strUrl );
+                my $res    = $ua->request($req);
+                if ( $res->is_success ) {
+                    my ( $width, $height ) = imgsize( \$res->content );
+                    $node->attr( 'width',  $width );
+                    $node->attr( 'height', $height );
+                }
+                else {
+                    $node->attr( 'width',  undef );
+                    $node->attr( 'height', undef );
+                    if ($boolDebug) {
+                        print "<p>debug (SetImgsize):  url open error "
+                          . basename( $node->attr('src') )
+                          . "</p>\n";
+                    }
+                }
+            }
+        }
+    }
+
     # 属性値を英数小文字に変換する
     if ($boolRewriteAttrSmall) {
         for my $i ( 0 .. $#arrAttr ) {
@@ -261,9 +297,10 @@ sub sub_print_html {
     $tree->eof();
 
     # HTMLソースコードを画面出力
-    my $strEntityChar = "<>&" . pack( "U", 0x81 ) . "-" . pack( "U", 0x38f );
+    my $strEntityChar = "<>&";
 
-    #	for(my $i=0x0081; $i<0x052f; $i++){ $strEntityChar .= pack("U", $i); }
+    #	my $strEntityChar = "<>&".pack("U", 0x81)."-".pack("U", 0x38f);
+    for ( my $i = 0x0081 ; $i < 0x038f ; $i++ ) { $strEntityChar .= pack( "U", $i ); }
     if ($boolDownload) {
         if   ($boolIndentTab) { print $tree->as_HTML( $strEntityChar, "\t", {} ); }
         else                  { print $tree->as_HTML( $strEntityChar, "  ", {} ); }
