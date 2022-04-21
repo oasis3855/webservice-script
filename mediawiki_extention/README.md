@@ -45,13 +45,13 @@ MediaWikiで個人Webページを運用するときに、訪問者に書き込�
 
 ## 運用ノウハウ
 
-### バックアップとリストアの方法
+### [バックアップとリストアの方法](readme_documents/howto_backup_restore.md)
 
 ### sitemap作成やキャッシュ破棄などを行うスクリプト例
 
-### InterWikiのキーワードを追加する方法
+### [InterWikiのキーワードを追加する方法](readme_documents/howto_add_interwiki.md)
 
-### セットアップ時のシステム設定調整
+### [セットアップ時のシステム設定調整](readme_documents/howto_setup_config.md)
 
 ### [利用頻度の多いグローバル変数](readme_documents/howto_global_variables.md)
 
