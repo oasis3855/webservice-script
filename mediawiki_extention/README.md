@@ -7,19 +7,6 @@
 
 Last Updated : Jan. 2012 -- ***this is discontinued software 開発終了***
 
-- [ソフトウエアのダウンロード](#ソフトウエアのダウンロード)
-- [概要](#概要)
-- [拡張機能](#拡張機能)
-  - [previouspage restrict拡張機能](#previouspage-restrict拡張機能)
-  - [specialpage restrict拡張機能](#specialpage-restrict拡張機能)
-  - [protect page拡張機能](#protect-page拡張機能)
-- [運用ノウハウ](#運用ノウハウ)
-  - [バックアップとリストアの方法](#バックアップとリストアの方法)
-  - [sitemap作成やキャッシュ破棄などを行うスクリプト例](#sitemap作成やキャッシュ破棄などを行うスクリプト例)
-  - [InterWikiのキーワードを追加する方法](#interwikiのキーワードを追加する方法)
-  - [セットアップ時のシステム設定調整](#セットアップ時のシステム設定調整)
-  - [利用頻度の多いグローバル変数](#利用頻度の多いグローバル変数)
-
 <br />
 <br />
 
@@ -47,7 +34,7 @@ MediaWikiで個人Webページを運用するときに、訪問者に書き込�
 
 ### [バックアップとリストアの方法](readme_documents/howto_backup_restore.md)
 
-### sitemap作成やキャッシュ破棄などを行うスクリプト例
+### [sitemap作成やキャッシュ破棄などを行うメンテナンス用スクリプト例](readme_documents/howto_maintenancetask.md)
 
 ### [InterWikiのキーワードを追加する方法](readme_documents/howto_add_interwiki.md)
 

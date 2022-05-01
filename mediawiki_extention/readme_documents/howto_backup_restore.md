@@ -46,7 +46,7 @@ MediaWikiテキストデータのバックアップとリストア方法。MySQL
 特殊な文字が存在する場合の欠落を防ぐため、--hex-blobオプションでバイナリデータを16進数表記文字列にコンバートして出力する。
 
 ```bash
-mysqldump -Q --host=$MYSQL_SERVER --user=$MYSQL_USER --password=$MYSQL_PASSWD --default-character-s
+mysqldump -Q --host=$MYSQL_SERVER --user=$MYSQL_USER --password=$MYSQL_PASSWD --default-character-set=binary --hex-blob $MYSQL_DB_NAME > backup.sql
 ```
 
 ### cronを使って定期的に自動でバックアップするためのスクリプト
