@@ -5,7 +5,11 @@
 <br />
 <br />
 
+- [HTML::TreeBuilderによるHTML整形Perlスクリプト （XHTML対応）（Web Service）](#htmltreebuilderによるhtml整形perlスクリプト-xhtml対応web-service)
+- [MediaWiki拡張機能](#mediawiki拡張機能)
+  - [MediaWiki運用ノウハウ](#mediawiki運用ノウハウ)
 - [Webファイルブラウザ（Web Service）](#webファイルブラウザweb-service)
+- [証明写真作成PHPスクリプト（Web Service）](#証明写真作成phpスクリプトweb-service)
 - [シンプルなメール送受信PHPスクリプト（Web Service）](#シンプルなメール送受信phpスクリプトweb-service)
 - [mp3ストリーミングのプレイリスト(PLS)管理Perlスクリプト（Web Service）](#mp3ストリーミングのプレイリストpls管理perlスクリプトweb-service)
 - [RSS巡回表示（Web Service）](#rss巡回表示web-service)
@@ -16,11 +20,56 @@
 <br />
 <br />
 
+
+## HTML::TreeBuilderによるHTML整形Perlスクリプト （XHTML対応）（Web Service）
+
+HTMLファイルのソースコードのインデントを整え、HTML/XHTML規格に準拠していない属性値を修正して画面表示します。ユーザは任意のローカルファイルをアップロードして整形対象にすることが出来ます。
+
+[配布ディレクトリ html-treebuilder](html-treebuilder/README.md) (2022/03/24)
+
+<br />
+<br />
+
+## MediaWiki拡張機能
+
+MediaWikiで個人Webページを運用するときに、訪問者に書き込みやシステム運用関連ページなどの不必要な機能を見せない・使わせないために必要になる拡張機能や設定。
+
+- previouspage restrict拡張機能
+- specialpage restrict拡張機能
+- protect page拡張機能
+
+[配布ディレクトリ mediawiki_extention](mediawiki_extention/README.md) (2012/01/20)
+
+<br />
+<br />
+
+### MediaWiki運用ノウハウ
+
+- バックアップとリストアの方法
+- sitemap作成やキャッシュ破棄などを行うメンテナンス用スクリプト例
+- InterWikiのキーワードを追加する方法
+- セットアップ時のシステム設定調整
+- 利用頻度の多いグローバル変数
+
+[ドキュメント格納場所 mediawiki_extention/readme_documents](mediawiki_extention/readme_documents/README.md)
+
+<br />
+<br />
+
 ## Webファイルブラウザ（Web Service）
 
 Webサーバ内のディレクトリやファイルの一覧を表示したり、HTMLファイル記述時用に画像やデータファイルなどへのリンク（HTMLソースコード）を自動作成することができます。
 
-[配布ディレクトリ websvn-admin](web-file-browser/README.md) (2013/12/05)
+[配布ディレクトリ web-file-browser](web-file-browser/README.md) (2013/12/05)
+
+<br />
+<br />
+
+## 証明写真作成PHPスクリプト（Web Service）
+
+コンビニ・家電量販店・スーパー等に設置されている「写真プリント機」や「マルチコピー機」で、運転免許やパスポートなどに使う証明写真を出力させるための画像ファイルを作成するためのスクリプトです。
+
+[配布ディレクトリ web-idpassport-photo](web-idpassport-photo/README.md) (2022/03/31)
 
 <br />
 <br />
