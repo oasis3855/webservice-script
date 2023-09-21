@@ -8,6 +8,7 @@
 - [HTML::TreeBuilderによるHTML整形Perlスクリプト （XHTML対応）（Web Service）](#htmltreebuilderによるhtml整形perlスクリプト-xhtml対応web-service)
 - [MediaWiki拡張機能](#mediawiki拡張機能)
   - [MediaWiki運用ノウハウ](#mediawiki運用ノウハウ)
+- [静的サイトのXML形式サイトマップファイル自動生成スクリプト](#静的サイトのxml形式サイトマップファイル自動生成スクリプト)
 - [Webファイルブラウザ（Web Service）](#webファイルブラウザweb-service)
 - [証明写真作成PHPスクリプト（Web Service）](#証明写真作成phpスクリプトweb-service)
 - [シンプルなメール送受信PHPスクリプト（Web Service）](#シンプルなメール送受信phpスクリプトweb-service)
@@ -52,6 +53,15 @@ MediaWikiで個人Webページを運用するときに、訪問者に書き込�
 - 利用頻度の多いグローバル変数
 
 [ドキュメント格納場所 mediawiki_extention/readme_documents](mediawiki_extention/readme_documents/README.md)
+
+<br />
+<br />
+
+## 静的サイトのXML形式サイトマップファイル自動生成スクリプト
+
+UNIXまたはLinuxのwebサーバで、cronなどを用いて自動的にXML形式サイトマップファイル（sitemap.xml）を自動生成するためのスクリプト
+
+[配布ディレクトリ sitemap-txt2xml](sitemap-txt2xml/README.md) (2023/09/21)
 
 <br />
 <br />
