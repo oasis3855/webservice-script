@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc><$MTBlogURL encode_xml="1"$></loc>
+<priority>1.0</priority>
+</url>
+<MTEntries lastn="9999">
+<url>
+<loc><$MTEntryPermalink encode_xml="1"$></loc>
+<lastmod><$MTEntryModifiedDate utc="1" format="%Y-%m-%dT%H:%M:%SZ"$></lastmod>
+</url>
+</MTEntries>
+</urlset>

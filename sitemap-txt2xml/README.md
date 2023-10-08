@@ -35,6 +35,12 @@ Last Updated : Sep. 2023
 
 UNIXまたはLinuxのwebサーバで、cronなどを用いて自動的にXML形式サイトマップファイル（sitemap.xml）を自動生成するためのスクリプト
 
+※ なお、Movable Typeで自動作成するWebサイトの場合は、このリポジトリ内の[MovableTypeでのXML形式サイトマップファイル自動生成スクリプト](../sitemap-movabletype/README.md)を使う
+
+<br />
+
+少し話がそれたが、再び本題に戻る
+
 次の2ステップでsitemap.xmlファイルを作成する
 
 <br />
