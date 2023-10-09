@@ -5,6 +5,7 @@
 <br />
 <br />
 
+- [jQuery lightbox "FancyBox"にカスタムボタン追加](#jquery-lightbox-fancyboxにカスタムボタン追加)
 - [HTML::TreeBuilderによるHTML整形Perlスクリプト （XHTML対応）（Web Service）](#htmltreebuilderによるhtml整形perlスクリプト-xhtml対応web-service)
 - [MediaWiki拡張機能](#mediawiki拡張機能)
   - [MediaWiki運用ノウハウ](#mediawiki運用ノウハウ)
@@ -22,6 +23,14 @@
 <br />
 <br />
 
+## jQuery lightbox "FancyBox"にカスタムボタン追加
+
+画像表示のjQueryライブラリ[FancyBox](https://fancyapps.com/fancybox/)に、フルスクリーン表示ボタン、スライドショー開始・終了のカスタムボタンを追加する機能拡張を行った
+
+[配布ディレクトリ fancybox_custombutton](fancybox_custombutton/README.md) (2016/02/13)
+
+<br />
+<br />
 
 ## HTML::TreeBuilderによるHTML整形Perlスクリプト （XHTML対応）（Web Service）
 
@@ -62,7 +71,7 @@ MediaWikiで個人Webページを運用するときに、訪問者に書き込�
 
 Movable Typeで記事追加時に、自動的にサイトマップファイルを作成させるためのインデックス・テンプレート
 
-[配布ディレクトリ sitemap-txt2xml](sitemap-movabletype/README.md) (2010/04/07)
+[配布ディレクトリ sitemap-movabletype](sitemap-movabletype/README.md) (2010/04/07)
 
 <br />
 <br />
