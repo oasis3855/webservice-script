@@ -9,6 +9,7 @@
  * Copyright 2012 Janis Skarnelis - janis@fancyapps.com
  *
  */
+/*** Full Screen and Slideshow Play button, added by H.INOUE 2016.FEB.13 ***/
 
 (function (window, document, $, undefined) {
 	"use strict";
@@ -74,6 +75,11 @@
 			aspectRatio : false,
 			topRatio    : 0.5,
 			leftRatio   : 0.5,
+
+			/******
+			 * Full Screen flag (**Add by H.INOUE 2016.FEB.13)
+			 ******/
+			modeFullScreen : false,
 
 			scrolling : 'auto', // 'auto', 'yes' or 'no'
 			wrapCSS   : '',
@@ -142,6 +148,10 @@
 				iframe   : '<iframe id="fancybox-frame{rnd}" name="fancybox-frame{rnd}" class="fancybox-iframe" frameborder="0" vspace="0" hspace="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen' + (IE ? ' allowtransparency="true"' : '') + '></iframe>',
 				error    : '<p class="fancybox-error">The requested content cannot be loaded.<br/>Please try again later.</p>',
 				closeBtn : '<a title="Close" class="fancybox-item fancybox-close" href="javascript:;"></a>',
+				// *** FullScreen and Play Button, added by H.INOUE 2016.FEB.13 ***
+				fullscreenBtn : '<a title="Full Screen" class="fancybox-item fancybox-fullscreen" href="javascript:;"></a>',
+				playBtn : '<a title="Full Screen" class="fancybox-item fancybox-play" href="javascript:;"></a>',
+				// ***
 				next     : '<a title="Next" class="fancybox-nav fancybox-next" href="javascript:;"><span></span></a>',
 				prev     : '<a title="Previous" class="fancybox-nav fancybox-prev" href="javascript:;"><span></span></a>'
 			},
@@ -1302,6 +1312,19 @@
 					width  = getScalar(height * ratio);
 				}
 
+				/*****
+				 * Full Screen mode, added by H.INOUE 2016.FEB.13
+				 *****/
+				if(F.opts.modeFullScreen == true){
+					width  = maxWidth;
+					height = getScalar(width / ratio);
+					if (height > maxHeight) {
+						height = maxHeight;
+						width  = getScalar(height * ratio);
+					}
+				}
+
+
 			} else {
 				width = Math.max(minWidth, Math.min(width, maxWidth));
 
@@ -1448,6 +1471,34 @@
 
 					F.close();
 				});
+
+				/*****
+				 * Full Screen (toggle) button, added by H.INOUE 2016.FEB.13
+				 *****/
+				$(current.tpl.fullscreenBtn).appendTo(F.skin).bind('click.fb', function(e) {
+					e.preventDefault();
+					if(F.opts.modeFullScreen == true) {
+						F.opts.modeFullScreen = false;
+						F.opts.margin = 20;
+						F.opts.helpers.title.type = 'outside';
+					}
+					else {
+						F.opts.modeFullScreen = true;
+						F.opts.margin = 1;
+						F.opts.helpers.title.type = 'over';
+					}
+					F.update();
+				});
+
+				/*****
+				 * Slideshow Play (toggle) button, added by H.INOUE 2016.FEB.13
+				 *****/
+				$(current.tpl.playBtn).appendTo(F.skin).bind('click.fb', function(e) {
+					e.preventDefault();
+					// toggle Slideshow
+					F.play();
+				});
+
 			}
 
 			// Create navigation arrows

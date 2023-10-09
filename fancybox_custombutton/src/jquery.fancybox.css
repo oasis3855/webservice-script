@@ -1,4 +1,5 @@
 /*! fancyBox v2.1.5 fancyapps.com | fancyapps.com/fancybox/#license */
+/*** Full Screen and Slideshow Play button, added by H.INOUE 2016.FEB.13 ***/
 .fancybox-wrap,
 .fancybox-skin,
 .fancybox-outer,
@@ -77,6 +78,17 @@
 
 #fancybox-loading, .fancybox-close, .fancybox-prev span, .fancybox-next span {
 	background-image: url('fancybox_sprite.png');
+    filter:alpha(opacity=50);
+    opacity:0.5;
+    -moz-opacity:0.5;
+}
+
+.fancybox-fullscreen {
+    background-image: url('fancybox_fullscreenbutton.png');
+}
+
+.fancybox-play {
+    background-image: url('fancybox_playbutton.png');
 }
 
 #fancybox-loading {
@@ -101,6 +113,26 @@
 	position: absolute;
 	top: -18px;
 	right: -18px;
+	width: 36px;
+	height: 36px;
+	cursor: pointer;
+	z-index: 8040;
+}
+
+.fancybox-fullscreen {
+	position: absolute;
+	top: -18px;
+	right: 18px;
+	width: 36px;
+	height: 36px;
+	cursor: pointer;
+	z-index: 8040;
+}
+
+.fancybox-play {
+	position: absolute;
+	top: -18px;
+	right: 54px;
 	width: 36px;
 	height: 36px;
 	cursor: pointer;
@@ -204,7 +236,8 @@
 	visibility: hidden;
 	font: normal 13px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;
 	position: relative;
-	text-shadow: none;
+/*	text-shadow: none; */
+    text-shadow: 0px 0px 3px rgba(0,0,0,0.8), 0px 0px 1px rgba(0,0,0,1.0);
 	z-index: 8050;
 }
 
@@ -251,10 +284,10 @@
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	color: #fff;
-	padding: 10px;
+	color: #eee;
+	padding: 2px;
 	background: #000;
-	background: rgba(0, 0, 0, .8);
+	background: rgba(0, 0, 0, .1);
 }
 
 /*Retina graphics!*/
@@ -266,6 +299,7 @@
 		background-image: url('fancybox_sprite@2x.png');
 		background-size: 44px 152px; /*The size of the normal image, half the size of the hi-res image*/
 	}
+
 
 	#fancybox-loading div {
 		background-image: url('fancybox_loading@2x.gif');
