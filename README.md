@@ -6,6 +6,7 @@
 <br />
 
 - [jQuery lightbox "FancyBox"にカスタムボタン追加](#jquery-lightbox-fancyboxにカスタムボタン追加)
+- [HTMLからa hrefと画像 img src リンクURLを抽出するPerlスクリプト](#htmlからa-hrefと画像-img-src-リンクurlを抽出するperlスクリプト)
 - [HTML::TreeBuilderによるHTML整形Perlスクリプト （XHTML対応）（Web Service）](#htmltreebuilderによるhtml整形perlスクリプト-xhtml対応web-service)
 - [MediaWiki拡張機能](#mediawiki拡張機能)
   - [MediaWiki運用ノウハウ](#mediawiki運用ノウハウ)
@@ -28,6 +29,15 @@
 画像表示のjQueryライブラリ[FancyBox](https://fancyapps.com/fancybox/)に、フルスクリーン表示ボタン、スライドショー開始・終了のカスタムボタンを追加する機能拡張を行った
 
 [配布ディレクトリ fancybox_custombutton](fancybox_custombutton/README.md) (2016/02/13)
+
+<br />
+<br />
+
+## HTMLからa hrefと画像 img src リンクURLを抽出するPerlスクリプト
+
+指定したWebページ内のリンク（a href="..."）や画像（img src="..."）のurlを、指定した条件のもとに抽出するスクリプト。
+
+[配布ディレクトリ html_extract_linkurl](html_extract_linkurl/README.md) (2023/10/10)
 
 <br />
 <br />
