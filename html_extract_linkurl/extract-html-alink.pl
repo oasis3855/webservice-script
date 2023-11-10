@@ -11,6 +11,7 @@
 #
 # Version 0.1  : 2011/02/13
 # Version 0.2  : 2014/01/03
+# Version 0.3  : 2023/10/10    https対応
 #
 # GNU GPL Free Software
 #
@@ -85,7 +86,7 @@ else {
 foreach my $url (@arr_url) {
 
     # urlリストの対象行がurlでない場合、あるいはダウンロード不可能な場合、次行へ
-    if ( !defined($url) || length($url) <= 0 || $url !~ /^http:\/\// ) { next; }
+    if ( !defined($url) || length($url) <= 0 || $url !~ /^(http:|https:)\/\// ) { next; }
     my $content;
     unless ( $content = LWP::Simple::get($url) ) { next; }
 
@@ -109,28 +110,28 @@ foreach my $url (@arr_url) {
                 if ( defined($auth) && length($auth) <= 0 ) { $auth = undef; }
 
                 # 抽出したリンクをフィルタに掛ける
-                if    ( defined($scheme) && lc($scheme) ne 'http' ) { } # http:// 以外
-                elsif ( !defined($scheme) && defined($auth) )       { } # サイト内（http://未指定）で、ドメイン名がある
+                if    ( defined($scheme) && lc($scheme) !~ /^http/ ) { }    # http://, https:// 以外
+                elsif ( !defined($scheme) && defined($auth) ) { }    # サイト内（http://未指定）で、ドメイン名がある
                 elsif ( !defined($auth) && ( !defined($path) || length($path) <= 0 ) ) {
-                }                                                       # urlで無い可能性
+                }                                                    # urlで無い可能性
                 elsif (defined($auth_user)
                     && $auth_user eq '+'
                     && defined($auth)
                     && ( lc($auth) ne lc($auth_base) ) )
                 {
-                }                                                       # 他のドメインは無視
+                }                                                    # 他のドメインは無視
                 elsif (defined($auth_user)
                     && $auth_user ne '+'
                     && defined($auth)
                     && ( $auth !~ m/$auth_user/ ) )
                 {
-                }                                                       # 指定ドメイン以外
+                }                                                    # 指定ドメイン以外
                 elsif (defined($auth_user)
                     && $auth_user ne '+'
                     && !defined($auth)
                     && ( $auth_base !~ m/$auth_user/ ) )
                 {
-                }                                                       # 指定ドメイン以外
+                }                                                    # 指定ドメイン以外
                 elsif ( defined($path_user) && $path !~ /$path_user/ ) { }    # ユーザ指定のパス文字が含まれない
                 else {
                     my $href = $extracted_url;
@@ -139,14 +140,12 @@ foreach my $url (@arr_url) {
                     if ( !defined($scheme) && !defined($auth) && $path !~ /^\// ) {
 
                         # 相対ディレクトリの場合
-                        $href =
-                            'http://'
-                          . $auth_base
-                          . substr( $path_base, 0, rindex( $path_base, '/' ) + 1 )
-                          . $href;
+                        $href = $scheme_base . '://'    # 'http://' or 'https://'
+                          . $auth_base                  # 'www.example.com'
+                          . substr( $path_base, 0, rindex( $path_base, '/' ) + 1 ) . $href;
                     }
                     elsif ( !defined($scheme) && !defined($auth) ) {
-                        $href = 'http://' . $auth_base . $href;
+                        $href = $scheme_base . '://' . $auth_base . $href;
                     }    # 絶対ディレクトリの場合
                          # 完成した抽出リンクを、一旦配列に格納
                     push( @arr_extracted, $href );
