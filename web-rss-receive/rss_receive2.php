@@ -5,7 +5,10 @@
 	<meta http-equiv="Content-Language" content="ja" />
 	<!-- disable viewport for mobile device -->
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=2.0,minimum-scale=1.0,user-scalable=1" />
-	<link rel="stylesheet" href="rss_receive.css" type="text/css" />
+<!--	<link rel="stylesheet" href="rss_receive.css" type="text/css" />    -->
+<?php
+print_header_stylesheet()
+?>
 
 	<title> </title>
 </head>
@@ -17,6 +20,7 @@
 // Software name : rss_receive.php		version 1.01 (2009/11/19)
 //                                      version 1.1  (2014/09/15)
 //                                      version 1.11 (2021/02/17) PHP7対応
+//                                      version 1.2  (2024/04/27) ダークテーマ
 // Copyright (C) 2009 INOUE Hirokazu
 // All Rights Reserved
 //
@@ -113,8 +117,6 @@ else if(isset($_GET['editconfig']) && !empty($_GET['editconfig']))
 		edit_config_file($strReloadPage, 0, '', '');
 	else if($_GET['editconfig'] == 'save')
 		edit_config_file($strReloadPage, 1, $_POST['config'], $_POST['password']);
-	else if($_GET['editconfig'] == 'update')
-		edit_config_file($strReloadPage, 2, '', '');
 	else
 		print("<p>コマンドパラメータ（editconfig）が誤っています</p>\n");
 
@@ -130,15 +132,37 @@ else
 
 print("<p><a href=\"./$strReloadPage\">RSS一覧画面を再表示する</a>&nbsp;&nbsp;|&nbsp;&nbsp;\n".
 	"<a href=\"./$strReloadPage?showall=true\">全RSSサイト巡回一括表示</a>&nbsp;&nbsp;|&nbsp;&nbsp;\n".
-	"<a href=\"./$strReloadPage?editconfig=view\">RSSサイト設定ファイルを編集</a>&nbsp;&nbsp;|&nbsp;&nbsp;\n".
-	"<a href=\"./$strReloadPage?editconfig=update\">設定ファイルのアップデート</a></p>\n".
+	"<a href=\"./$strReloadPage?editconfig=view\">RSSサイト設定ファイルを編集</a></p>\n".
 	"</body>\n</html>\n");
 
 // プログラム終了
 exit();
 
+//************************************************
+// head出力でスタイルシートを切り替える関数
+//************************************************
+function print_header_stylesheet()
+{
+	$nSwTopicCount = 10;	// 表示する記事数
+	$nSwDescription = 1;	// 本文を表示するかどうか
+	$nSwPrevDays = 1;		// 過去1日分を表示
+	$nSwDarktheme = 0;		// 1:ダークテーマ、0:ライトテーマ
+	
+	// 設定ファイルより設定を読み込む
+	read_config($nSwTopicCount, $nSwDescription, $nSwPrevDays, $nSwDarktheme);
 
-//************************************************
+	if($nSwDarktheme == 1)
+	{
+		print("<link rel=\"stylesheet\" href=\"rss_receive_dark.css\" type=\"text/css\" />");
+	}
+	else
+	{
+		print("<link rel=\"stylesheet\" href=\"rss_receive.css\" type=\"text/css\" />");
+	}
+}
+
+
+//************************************************
 // RSSサイトの一覧を表示する関数
 //************************************************
 function display_rssuri_list($strReloadPage)
@@ -174,7 +198,8 @@ function display_rssuri_list($strReloadPage)
 	}
 
 }
-
+
+
 
 //************************************************
 // 全てのRSSサイトを巡回して表示する関数
@@ -212,9 +237,10 @@ function read_rss($uri)
 	$nSwTopicCount = 10;	// 表示する記事数
 	$nSwDescription = 1;	// 本文を表示するかどうか
 	$nSwPrevDays = 1;		// 過去1日分を表示
+	$nSwDarktheme = 0;		// 1:ダークテーマ、0:ライトテーマ
 	
 	// 設定ファイルより設定を読み込む
-	read_config($nSwTopicCount, $nSwDescription, $nSwPrevDays);
+	read_config($nSwTopicCount, $nSwDescription, $nSwPrevDays, $nSwDarktheme);
 
 	// RSSファイルの受信
 	$strRssSource  = file_get_contents($uri);
@@ -226,7 +252,8 @@ function read_rss($uri)
 
 	// XML_RSSクラスの初期化と、受信
 	$rss = new XML_Feed_Parser($strRssSource);
-	// RSSサイトのタイトル行を表示
+
+	// RSSサイトのタイトル行を表示
 	printf("<h2><span class=\"head\">%s</span> (%s) <a target=\"_blank\" href=\"%s\">%s</a></h2>\n", trim($rss->title),
 			$rss->__get('version'), $uri, $uri);
 
@@ -273,7 +300,8 @@ function read_rss($uri)
 		$i++;
 		if($i>=$nSwTopicCount) break;	// 指定されたトピック数のみ表示
 	}
-	print("</ul>\n");
+
+	print("</ul>\n");
 	
 	return $strReturn;
 }
@@ -333,59 +361,6 @@ function edit_config_file($strReloadPage, $nMode, $strConfig, $strPassword)
 			print("<p>ファイルに書き込めませんでした</p>\n");
 
 	}
-	else if($nMode == 2)
-	{	// 設定ファイルのURIのタイトルをアップデートする
-	
-		// ファイルを読み込み、各行を配列に格納
-		$arrLines = @file("./rss_receive.ini", FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES|FILE_TEXT);
-
-		$handle = @fopen("./rss_receive.ini", "w");
-		if($handle == null)
-		{
-			print("<p>設定ファイルに書き込めません</p>\n");
-			return;
-		}
-		
-		$nLine = 0;		// 現在の処理行数
-		foreach($arrLines as $item)
-		{
-			$nLine++;
-			if($nLine <= 1)
-			{	// 1行目は設定リスト行のため、そのまま書き込む
-				fwrite($handle, $item."\n");
-				continue;
-			}
-			
-			// URIとタイトルを、『,』で切り分ける
-			$arrUri = explode(',', $item, 2);
-
-			// URIの末尾にある改行コードを取り除く
-			$uri = trim($arrUri[0]);
-			print("<p>処理中 ... ".htmlspecialchars($uri)."</p>\n");
-			// RSSを読み込む
-			$strRssSource  = file_get_contents($uri);
-			if($strRssSource == false)
-			{	// 読み込み失敗の場合、元の内容を設定ファイルへ書き込む
-				fwrite($handle, $item."\n");
-				continue;
-			}
-			// XML_RSSクラスの初期化と、受信
-			$rss = new XML_Feed_Parser($strRssSource);
-			
-			print("<p> ...RSS タイトル:".htmlspecialchars(trim($rss->title))."</p>\n");
-			if(strlen($rss->title))
-			{
-				fwrite($handle, $uri.','.htmlspecialchars(trim($rss->title))."\n");
-			}
-			else
-			{
-				fwrite($handle, $item."\n");
-			}
-			
-		}
-
-		fclose($handle);
-	}
 	else
 	{
 		print("<p>edit_config_file関数へのパラメータが違います</p>\n");
@@ -396,7 +371,7 @@ function edit_config_file($strReloadPage, $nMode, $strConfig, $strPassword)
 //************************************************
 // 設定ファイルの1行目から、基本設定項目を読み込む関数
 //************************************************
-function read_config(&$nSwTopicCount, &$nSwDescription, &$nSwPrevDays)
+function read_config(&$nSwTopicCount, &$nSwDescription, &$nSwPrevDays, &$nSwDarktheme)
 {
 	$handle = @fopen("./rss_receive.ini", "r");
 	if ($handle == false) return;
@@ -414,6 +389,8 @@ function read_config(&$nSwTopicCount, &$nSwDescription, &$nSwPrevDays)
 			$nSwDescription = intval($arySetting[1]);
 		if($arySetting[0] == 'days')
 			$nSwPrevDays = intval($arySetting[1]);
+		if($arySetting[0] == 'darktheme')
+			$nSwDarktheme = intval($arySetting[1]);
 	}
 
 }

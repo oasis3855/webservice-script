@@ -135,7 +135,7 @@ PHPスクリプトでメールを送受信するサンプルWebサービス。im
 
 シンプルなRSSブラウザ。表示するRSSサイトはWeb上で編集可能。
 
-[配布ディレクトリ websvn-admin](web-rss-receive/README.md) (2014/09/16)
+[配布ディレクトリ websvn-admin](web-rss-receive/README.md) (2024/04/27)
 
 <br />
 <br />

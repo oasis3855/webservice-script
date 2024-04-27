@@ -1,14 +1,16 @@
 
 body {
     font-size:11pt;
-    background-color:#e6e6e6;
+    background-color:#333;
+    color:darkgray;
 }
 
 h2 {
     font-size:0.8em;
     font-style:normal;
     font-weight:normal;
-    background-color:#d5d9e6;
+    color:white;
+    background-color:#555;
     margin-top: 0;
     padding-top:10px;
     margin-bottom: 5px;
@@ -17,6 +19,10 @@ h2 {
 
 h2 span.head {
     font-size:1.5em;
+}
+
+a {
+    color:#99f;
 }
 
 ul {
@@ -45,7 +51,7 @@ li span.date {
 li a {
     font-size:1.2em;
     text-decoration:none;
-    color:black;
+    color:#eee;
 }
 
 /* 低解像度 */
