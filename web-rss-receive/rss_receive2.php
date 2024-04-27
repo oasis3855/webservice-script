@@ -16,6 +16,7 @@
 //************************************************
 // Software name : rss_receive.php		version 1.01 (2009/11/19)
 //                                      version 1.1  (2014/09/15)
+//                                      version 1.11 (2021/02/17) PHP7対応
 // Copyright (C) 2009 INOUE Hirokazu
 // All Rights Reserved
 //
@@ -78,7 +79,8 @@ date_default_timezone_set('Asia/Tokyo');
 $dcurl = 'http://purl.org/dc/elements/1.1/';
 
 // このページのファイル名（リロード用）
-$strReloadPage = 'rss_receive2.php';
+//$strReloadPage = 'rss_receive2.php';
+$strReloadPage = basename(__FILE__);
 
 print("<p>RSS受信（Pear XML_Feed_Parser)</p>\n");
 
@@ -155,7 +157,7 @@ function display_rssuri_list($strReloadPage)
 			if($nLine <= 1) continue;	// 1行目は設定リスト行（読み飛ばす）
 			if(strlen($strLine) < 10) continue;	// URIが10文字以下はありえない。
 			// URIとタイトルを、『,』で切り分ける
-			$arrUri = split(',', $strLine, 2);
+			$arrUri = explode(',', $strLine, 2);
 			// 『,』以降が無い場合、タイトルはURIと同じとする
 			if(count($arrUri)<=1 || empty($arrUri[1])) $strTitle = $arrUri[0];
 			else $strTitle = $arrUri[1];
@@ -191,7 +193,7 @@ function read_all_rss()
 		}
 		
 		// URIとタイトルを、『,』で切り分ける
-		$arrUri = split(',', $item, 2);
+		$arrUri = explode(',', $item, 2);
 
 		// URIの末尾にある改行コードを取り除く
 		$uri = trim($arrUri[0]);
@@ -212,7 +214,7 @@ function read_rss($uri)
 	$nSwPrevDays = 1;		// 過去1日分を表示
 	
 	// 設定ファイルより設定を読み込む
-	read_config(&$nSwTopicCount, &$nSwDescription, &$nSwPrevDays);
+	read_config($nSwTopicCount, $nSwDescription, $nSwPrevDays);
 
 	// RSSファイルの受信
 	$strRssSource  = file_get_contents($uri);
@@ -223,7 +225,7 @@ function read_rss($uri)
 	}
 
 	// XML_RSSクラスの初期化と、受信
-	$rss =& new XML_Feed_Parser($strRssSource);
+	$rss = new XML_Feed_Parser($strRssSource);
 	// RSSサイトのタイトル行を表示
 	printf("<h2><span class=\"head\">%s</span> (%s) <a target=\"_blank\" href=\"%s\">%s</a></h2>\n", trim($rss->title),
 			$rss->__get('version'), $uri, $uri);
@@ -355,7 +357,7 @@ function edit_config_file($strReloadPage, $nMode, $strConfig, $strPassword)
 			}
 			
 			// URIとタイトルを、『,』で切り分ける
-			$arrUri = split(',', $item, 2);
+			$arrUri = explode(',', $item, 2);
 
 			// URIの末尾にある改行コードを取り除く
 			$uri = trim($arrUri[0]);
@@ -368,7 +370,7 @@ function edit_config_file($strReloadPage, $nMode, $strConfig, $strPassword)
 				continue;
 			}
 			// XML_RSSクラスの初期化と、受信
-			$rss =& new XML_Feed_Parser($strRssSource);
+			$rss = new XML_Feed_Parser($strRssSource);
 			
 			print("<p> ...RSS タイトル:".htmlspecialchars(trim($rss->title))."</p>\n");
 			if(strlen($rss->title))
@@ -402,10 +404,10 @@ function read_config(&$nSwTopicCount, &$nSwDescription, &$nSwPrevDays)
 	$strLine = htmlspecialchars(fgets($handle));
 	fclose($handle);
 	
-	$aryConfig = split(',', $strLine);
+	$aryConfig = explode(',', $strLine);
 	foreach($aryConfig as $item)
 	{
-		$arySetting = split('=', $item);
+		$arySetting = explode('=', $item);
 		if($arySetting[0] == 'count')
 			$nSwTopicCount = intval($arySetting[1]);
 		if($arySetting[0] == 'desc')
