@@ -77,6 +77,7 @@ days=2,desc=1,count=10,darktheme=1
   - PHP7対応 (split->explode)
 - version 1.2 (2024/04/27)
   - ダークテーマCSS切替対応
+  - phpcbfでコード整形、ユーザディレクトリを自動取得
 
 ## ライセンス
 
