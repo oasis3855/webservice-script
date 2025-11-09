@@ -145,7 +145,7 @@ PHPスクリプトでメールを送受信するサンプルWebサービス。im
 
 任意のファイルをWebサーバにアップロードするWeb Serviceスクリプト。アップロードするファイルが画像ファイルの場合は、[fancybox](http://fancybox.net/) (jQuery lightbox) に対応したタグを含めたHTMLタグを結果表示する。
 
-[配布ディレクトリ web-uploader](web-uploader/README.md) (2015/01/17)
+[配布ディレクトリ web-uploader](web-uploader/README.md) (2015/10/04)
 
 <br />
 <br />

@@ -13,6 +13,7 @@
 # version 0.1.2 (2012/Jun/18) : bugfix
 # version 0.1.3 (2013/11/10) : ディレクトリ選択を記憶, INIファイル
 # version 0.1.4 (2015/01/17) : 出力HTMLのa target属性をONにしないのをデフォルトに変更
+# version 0.1.5 (2025/10/04) : Stat::lsMode と Config::Tiny をインライン関数化
 #
 # GNU GPL Free Software
 #
@@ -37,20 +38,14 @@ use strict;
 use warnings;
 use utf8;
 
-# ユーザディレクトリ下のCPANモジュールを読み込む
-use lib ((getpwuid($<))[7]).'/local/cpan/lib/perl5';    # ユーザ環境にCPANライブラリを格納している場合
-use lib ((getpwuid($<))[7]).'/local/lib/perl5';         # ユーザ環境にCPANライブラリを格納している場合
-use lib ((getpwuid($<))[7]).'/local/lib/perl5/site_perl/5.8.9/mach';         # ユーザ環境にCPANライブラリを格納している場合
-use lib ((getpwuid($<))[7]).'/local/lib/perl5/site_perl/5.8.9';         # ユーザ環境にCPANライブラリを格納している場合
-
 use CGI;
 use File::Basename;
 use File::Copy;
 use Image::Size;
 use Encode::Guess qw/euc-jp shiftjis iso-2022-jp/;	# 必要ないエンコードは削除すること
 use HTML::Entities;
-use Stat::lsMode qw/format_mode/;	# ファイル属性を -rwxr-xr-x のように整形する
-use Config::Tiny;	# INIファイル読み書き
+# use Stat::lsMode qw/format_mode/;	# ファイル属性を -rwxr-xr-x のように整形する
+# use Config::Tiny;	# INIファイル読み書き
 
 # 認証システムは、このパッケージに含まれていません。別途、ユーザ環境のものを呼び出してください
 require ((getpwuid($<))[7]).'/auth/auth.pl';    # 認証システム
@@ -158,7 +153,7 @@ _EOT
 		"<h2>System</h2>\n");
 	{
 		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-		printf("<p>%04d/%02d/%02d %02d:%02d:%02d</p>\n", $year+1900, $mon+1, $mday, $hour, $min, $sec); 
+		printf("<p>Perl Version $^V</p>\n<p>%04d/%02d/%02d %02d:%02d:%02d</p>\n", $year+1900, $mon+1, $mday, $hour, $min, $sec); 
 	}
 	print("<h2>Menu</h2>\n".
 		"<ul>\n".
@@ -184,7 +179,7 @@ print << '_EOT_FOOTER';
 <p>&nbsp;</p> 
 <div class="clear"></div> 
 <div id="footer"> 
-<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.4 &nbsp;&nbsp; GNU GPL free software</p> 
+<p><a href="http://oasis.halfmoon.jp/">Web Uploader</a> version 0.1.5 (2025/10/04) &nbsp;&nbsp; GNU GPL free software</p> 
 </div>	<!-- id="footer" --> 
 _EOT_FOOTER
 
@@ -234,10 +229,19 @@ sub sub_check_files{
 sub sub_read_varsave {
 	our @arr_updirs;
 
-	# INIファイルの読み込み
-	my $config = Config::Tiny->new();
-	$config = Config::Tiny->read($str_fpath_varsave);
-	if(!defined($config)){ $n_dir_select = 0; return; }		# INIファイル読み込み失敗
+	my $config = read_ini($str_fpath_varsave);
+
+	if ( !defined($config) ) {
+		# INIファイル読み込み失敗
+		$n_dir_select = 0;
+		return;
+	}
+	# my $str_temp = $config->{arr_updirs}->{select};
+
+	# # INIファイルの読み込み
+	# my $config = Config::Tiny->new();
+	# $config = Config::Tiny->read($str_fpath_varsave);
+	# if(!defined($config)){ $n_dir_select = 0; return; }		# INIファイル読み込み失敗
 
 	# INIファイルの [arr_updirs] セクション内の select の値を得る
 	my $str_temp = $config->{arr_updirs}->{select};
@@ -253,10 +257,14 @@ sub sub_read_varsave {
 sub sub_write_varsave {
 	$n_dir_select = shift;
 
-	my $config = Config::Tiny->new();
+	my $config = {};
 	$config->{arr_updirs}->{select} = $n_dir_select;
-	# INIファイルに書き込み
-	$config->write($str_fpath_varsave);
+	write_ini( $str_fpath_varsave, $config );
+
+	# my $config = Config::Tiny->new();
+	# $config->{arr_updirs}->{select} = $n_dir_select;
+	# # INIファイルに書き込み
+	# $config->write($str_fpath_varsave);
 
 }
 
@@ -652,7 +660,7 @@ sub sub_list {
 			$filename = encode_entities(sub_conv_to_flagged_utf8($arr_filelist[$i], 'utf8'), '&<>\\\"\'');
 			my @filestat = stat($filename);
 			my ($sec,$min,$hour,$day,$mon,$year) = localtime($filestat[9]);
-			my $str_attr = Stat::lsMode::format_mode($filestat[2]);
+			my $str_attr = format_mode($filestat[2]);
 			my $str_timestamp = sprintf("%s %10d %04d-%02d-%02d %02d:%02d:%02d", $str_attr, $filestat[7], $year+1900, $mon+1, $day, $hour, $min, $sec);
 			print($str_timestamp." <a href=\"$str_this_script?mode=fileinfo&amp;dir=".($updirs_index+0)."&amp;filename=".basename($filename)."\">".basename($filename)."</a>\n");
 		}
@@ -829,3 +837,104 @@ sub sub_conv_to_safe_str
         return $str;
 }
 
+
+# *************
+# stat の第3要素（モード情報）を人間が読める形式（例: -rw-r--r--）に変換する関数 (Stat::lsMode::format_mode と互換の関数)
+# param[0]:	int mode (stat[2]相当のファイル属性値)
+# returm:	string "-rwxrwxrwx"形式の属性を表す文字列
+sub format_mode {
+    my ($mode) = @_;
+
+    # ファイルタイプ
+    my %file_types = (
+        0xC000 => 's',    # socket
+        0xA000 => 'l',    # symbolic link
+        0x8000 => '-',    # regular file
+        0x6000 => 'b',    # block device
+        0x4000 => 'd',    # directory
+        0x2000 => 'c',    # character device
+        0x1000 => 'p',    # FIFO
+    );
+    my $type_char = '?';
+
+    foreach my $type ( keys %file_types ) {
+        if ( ( $mode & 0xF000 ) == $type ) {
+            $type_char = $file_types{$type};
+            last;
+        }
+    }
+
+    # パーミッション
+    my @rwx      = qw(r w x);
+    my $perm_str = '';
+
+    for my $i ( 0 .. 2 ) {
+        my $shift = 6 - $i * 3;
+        my $bits  = ( $mode >> $shift ) & 0x7;
+
+        for my $j ( 0 .. 2 ) {
+            $perm_str .= ( $bits & ( 1 << ( 2 - $j ) ) ) ? $rwx[$j] : '-';
+        }
+    }
+
+    # setuid, setgid, sticky bit の処理
+    substr( $perm_str, 2, 1 ) =
+      ( $mode & 0x800 ) ? ( ( $perm_str =~ /^..x/ ) ? 's' : 'S' ) : substr( $perm_str, 2, 1 );
+    substr( $perm_str, 5, 1 ) =
+      ( $mode & 0x400 ) ? ( ( $perm_str =~ /^.....x/ ) ? 's' : 'S' ) : substr( $perm_str, 5, 1 );
+    substr( $perm_str, 8, 1 ) =
+      ( $mode & 0x200 ) ? ( ( $perm_str =~ /^........x/ ) ? 't' : 'T' ) : substr( $perm_str, 8, 1 );
+
+    return $type_char . $perm_str;
+}
+
+
+# *************
+# INIファイルに書き込む (Config::Tiny 互換)
+# param[0]: string ファイル名
+# return:   hash 全ての値を格納したハッシュ{セクション名}{値名}
+sub read_ini {
+    my ($filename) = @_;
+    open my $fh, '<', $filename or return undef;
+
+    my %config;
+    my $section = '';
+
+    while ( my $line = <$fh> ) {
+        chomp $line;
+        $line =~ s/^\s+|\s+$//g;                           # 前後の空白除去
+        next if $line eq '' or $line =~ /^;/;              # 空行・コメント除外
+
+        if ( $line =~ /^\[(.+?)\]$/ ) {
+            $section = $1;
+            $config{$section} ||= {};
+        }
+        elsif ( $line =~ /^([^=]+?)\s*=\s*(.*)$/ ) {
+            my ( $key, $value ) = ( $1, $2 );
+            $config{$section}{$key} = $value;
+        }
+    }
+    close $fh;
+    return \%config;
+}
+
+# *************
+# INIファイルに書き込む (Config::Tiny 互換)
+# param[0]: string ファイル名
+# param[1]: hash 全ての値を格納したハッシュ{セクション名}{値名}
+sub write_ini {
+    my ( $filename, $config_ref ) = @_;
+    open my $fh, '>', $filename or return 0;
+
+    foreach my $section ( sort keys %$config_ref ) {
+        print $fh "[$section]\n";
+
+        foreach my $key ( sort keys %{ $config_ref->{$section} } ) {
+            my $value = $config_ref->{$section}{$key};
+            print $fh "$key=$value\n";
+        }
+        print $fh "\n";
+    }
+    close $fh;
+    return 1;
+}

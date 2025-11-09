@@ -5,7 +5,7 @@
 <br />
 <br />
 
-Last Updated : Jan. 2015
+Last Updated : Oct. 2025
 
 - [ソフトウエアのダウンロード](#ソフトウエアのダウンロード)
 - [概要](#概要)
@@ -38,7 +38,7 @@ Last Updated : Jan. 2015
 
 ## 動作確認済み
 
-- FreeBSD 11.2 , Perl 5.26  (さくらインターネット 共用サーバ)
+- FreeBSD 13.0 , Perl 5.32  (さくらインターネット 共用サーバ)
 
 ## インストール方法
 
@@ -71,6 +71,8 @@ our $n_target_size = 320;
   - INIファイル
 - Version 0.1.4 (2015/01/17)
   - 出力HTMLのa target属性 OFFをデフォルト選択に
+- version 0.1.5 (2025/10/04)
+  - Stat::lsMode と Config::Tiny をインライン関数化
 
 
 ## ライセンス
