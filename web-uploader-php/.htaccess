@@ -1,0 +1,8 @@
+
+AuthType        Basic
+AuthUserFile    /home/tmg1136-inue2/.htpasswd
+AuthGroupFile   /dev/null
+AuthName        "You must login"
+require         valid-user
+
+

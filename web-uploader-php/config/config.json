@@ -1,0 +1,18 @@
+{
+    "base_url": "https://www.example.com",
+    "base_dir": "/home/username/www",
+    "array_subdir": [
+        "/pics/001",
+        "/pics/002",
+        "/temp"
+    ],
+    "filename_ascii_only": true,
+    "max_upload_size": 10485760,
+    "mimetype_fileext_limit": true,
+    "flag_overwrite": false,
+    "flag_no_alt_filename": true,
+    "flag_target_blank": false,
+    "flag_fancybox": true,
+    "default_image_size": 320,
+    "default_dir_index": 0
+}

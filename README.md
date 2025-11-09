@@ -18,6 +18,7 @@
 - [mp3ストリーミングのプレイリスト(PLS)管理Perlスクリプト（Web Service）](#mp3ストリーミングのプレイリストpls管理perlスクリプトweb-service)
 - [RSS巡回表示（Web Service）](#rss巡回表示web-service)
 - [Webファイルアップローダー（Web Service）](#webファイルアップローダーweb-service)
+- [Webファイルアップローダー PHP版（Web Service）](#webファイルアップローダー-php版web-service)
 - [WebSVN Administrator - Subversionリポジトリ管理（Web Service）](#websvn-administrator---subversionリポジトリ管理web-service)
 
 
@@ -145,6 +146,15 @@ PHPスクリプトでメールを送受信するサンプルWebサービス。im
 任意のファイルをWebサーバにアップロードするWeb Serviceスクリプト。アップロードするファイルが画像ファイルの場合は、[fancybox](http://fancybox.net/) (jQuery lightbox) に対応したタグを含めたHTMLタグを結果表示する。
 
 [配布ディレクトリ web-uploader](web-uploader/README.md) (2015/01/17)
+
+<br />
+<br />
+
+## Webファイルアップローダー PHP版（Web Service）
+
+任意のファイルをWebサーバにアップロードするWeb Serviceスクリプト。アップロードするファイルが画像ファイルの場合は、[fancybox](http://fancybox.net/) (jQuery lightbox) に対応したタグを含めたHTMLタグを結果表示する。
+
+[配布ディレクトリ web-uploader-php](web-uploader-php/README.md) (2025/09/02)
 
 <br />
 <br />
