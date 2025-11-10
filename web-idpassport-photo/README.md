@@ -5,11 +5,12 @@
 <br />
 <br />
 
-Last Updated : Mar. 2022
+Last Updated : Jul. 2025
 
 - [ソフトウエアのダウンロード](#ソフトウエアのダウンロード)
 - [概要](#概要)
   - [作成される画像ファイルの例](#作成される画像ファイルの例)
+  - [CLI (コマンドライン) モード](#cli-コマンドライン-モード)
 - [動作確認済み](#動作確認済み)
 - [インストール方法](#インストール方法)
 - [バージョン情報](#バージョン情報)
@@ -50,9 +51,17 @@ Last Updated : Mar. 2022
 
 サンプル画像では、Wikimedia Commonsの[ナポレオン・ボナパルト](https://commons.wikimedia.org/wiki/File:Bonabarte_Premier_consul.jpg)と[ヴァン猫](https://commons.wikimedia.org/wiki/File:Turkish_Van_Cat.jpg)の写真を利用しています。 
 
+### CLI (コマンドライン) モード
+
+コマンドラインの書式は次の通り (オプションを何も指定せずに実行すると、説明が表示される)
+
+```
+php index.php [-ls|-pt] [-s3024|-s4030|-s4535|-s5040] [-cs] input_filename output_filename
+```
+
 ## 動作確認済み
 
-- FreeBSD 11.2 , PHP 5.2  (さくらインターネット 共用サーバ)
+- FreeBSD 13.0 , PHP 8.2  (さくらインターネット 共用サーバ)
 
 ## インストール方法
 
@@ -67,6 +76,8 @@ Webサーバ上に適当なフォルダを作成して、スクリプトファ�
 - Version 1.0 (2010/08/04)
 - Version 1.1 (2022/03/31)
   - アップロードする最大ファイルサイズ制限を0.5MBytesから1.0MBytesに変更
+- version 2.0 (2025/07/29)
+  - CLIインターフェース実装
 
 ## ライセンス
 
